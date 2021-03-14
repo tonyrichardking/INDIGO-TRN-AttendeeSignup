@@ -1,0 +1,54 @@
+.rfl-signup-thankyou,
+.rfl-signup-header,
+.rfl-signup-inputs {
+  max-width: 768px;
+  margin: 0 auto;
+  font-size: 1rem;
+  font-family: "Karla", Arial, sans-serif;
+  color: #44006e;
+}
+
+.rfl-signup-inputs {
+  background: #fff;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  box-shadow: 1px 1px 8px 0 rgba(100, 100, 100, 0.2);
+  border-top: 6px #ffe15d solid;
+}
+
+.rfl-signup-thankyou {
+  background: #fff;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  box-shadow: 1px 1px 8px 0 rgba(100, 100, 100, 0.2);
+  border-top: 6px #ffe15d solid;
+}
+
+.rfl-signup-errormessage {
+  background: #fff;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  padding: 1.5rem;
+  box-shadow: 1px 1px 8px 0 rgba(100, 100, 100, 0.2);
+  border-top: 6px #ffe15d solid;
+  font-size: 1rem;
+  font-family: "Karla", Arial, sans-serif;
+  font-weight: bold;
+  color: #ff0000;
+}
+
+@media (max-width: 449px) {
+  .rfl-signup-inputs {
+    padding: 1.5rem 1rem;
+  }
+}
+
+.rfl-signup-inputs .slds-form-element {
+  margin-bottom: 1rem;
+}
+
+.rfl-signup-inputs .slds-m-left_x-small {
+  margin-left: 0;
+}

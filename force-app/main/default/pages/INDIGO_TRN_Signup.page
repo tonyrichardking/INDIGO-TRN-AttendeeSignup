@@ -1,0 +1,509 @@
+<apex:page sidebar="false" showHeader="false" standardStylesheets="true" showChat="false" showQuickActionVfHeader="false">
+
+    <apex:includeLightning />
+
+    <head>
+        <title>Indigo Training Courses</title>
+
+        <!--Socials meta tags-->
+        <meta property="og:title" content="Indigo Training Sign Up"></meta>
+        <meta property="og:description" content="Sign up for an Indigo training course."></meta>
+        <meta property="og:image" content="https://helprefugees--c.um4.visual.force.com/resource/1588331497000/IndigoLogo_900x200"></meta>
+        <meta property="og:url" content="https://helprefugees.org/aroundtheworld/signup"></meta>
+
+        <meta name="twitter:title" content="Indigo Training: Sign up"></meta>
+        <meta name="twitter:description" content="Sign up for an Indigo training course."></meta>
+        <meta name="twitter:image" content="https://helprefugees--c.um4.visual.force.com/resource/1588331497000/IndigoLogo_900x200"></meta>
+
+        <script>(function (UITheme) {
+                UITheme.getUITheme = function () {
+                    return UserContext.uiTheme;
+                };
+            }(window.UITheme = window.UITheme || {}));</script>
+
+        <style type="text/css">
+            [interop-tile_standardTile-host] {
+                display: block
+            }
+        </style>
+        <style type="text/css">
+            [lightning-input_input-host] {
+                display: block
+            }
+
+            [dir="rtl"] input[type=tel][lightning-input_input] {
+                direction: ltr;
+                text-align: right;
+                unicode-bidi: embed
+            }
+        </style>
+        <style type="text/css">
+            _:-ms-lang(x)[lightning-primitiveIcon_primitiveIcon],
+            svg[lightning-primitiveIcon_primitiveIcon] {
+                pointer-events: none
+            }
+        </style>
+    </head>
+
+    <body>
+        <span id="j_id0:j_id1"></span>
+        <link href="./RFL-Signup_files/hrRunForLoveSignup.css" type="text/css" rel="stylesheet" />
+
+        <meta http-equiv="PRAGMA" content="NO-CACHE"></meta>
+        <meta http-equiv="Expires" content="Mon, 01 Jan 1990 12:00:00 GMT"></meta>
+
+        <meta content="width=device-width, initial-scale=1" name="viewport"></meta>
+        <title>Sign up: Around the World in 40 Days</title>
+
+        <!-- Styling for main page -->
+        <style type="text/css">
+            @import url("https://fonts.googleapis.com/css?family=Karla:regular,bold");
+
+            body {
+                background-color: #fff;
+            }
+
+            .FlowContainer {
+                max-width: 1200px;
+                margin: auto;
+                padding: 0 1.5rem;
+                position: relative;
+                /* z-index: -1; */
+            }
+
+            /*-------------------------------------------------*/
+
+            /* Trying to change the inputs and buttons */
+
+            /*-------------------------------------------------*/
+
+            .slds-button_success {
+                background: #FFE15D !important;
+                border-radius: 0 !important;
+                border: 0 !important;
+                color: #44006E !important;
+                text-transform: uppercase !important;
+                font-size: 1rem !important;
+                padding: 2px 1rem !important;
+                font-weight: 800 !important;
+            }
+
+            .slds-button_success svg {
+                display: none !important;
+            }
+
+            .slds-form-element__label,
+            .slds-required {
+                color: #44006E !important;
+                font-size: 0.875rem !important;
+                font-family: "Karla", Arial, sans-serif !important;
+                text-transform: uppercase !important;
+            }
+
+            /*-------------------------------------------------*/
+
+            /* RFL Header */
+
+            /*-------------------------------------------------*/
+
+            .rfl-header {
+                max-width: 1400px;
+                margin: 0 auto 3rem auto;
+                width: 100%;
+                color: #44006E;
+                font-size: 1rem;
+                position: relative;
+            }
+
+            @media (max-width: 767px) {
+                .rfl-header {
+                    background: #44D1B5;
+                    margin-bottom: 2rem;
+                }
+            }
+
+            .outline {
+                color: #44006E;
+                -webkit-text-fill-color: #44D1B5;
+                -webkit-text-stroke-width: 1px;
+                -webkit-text-stroke-color: #44006E;
+            }
+
+            .rfl-banner-image {
+                width: 100%;
+                display: none;
+            }
+
+            .rfl-h1-strip {
+                display: none;
+            }
+
+            @media (min-width: 768px) {
+                .rfl-h1-strip {
+                    display: block;
+                    background: #44D1B5;
+                    padding: 1rem 1.5rem;
+                }
+
+                .rfl-h1-mobile {
+                    display: none;
+                }
+            }
+
+            .rfl-h1-mobile {
+                font-size: 30px;
+                text-transform: uppercase;
+                text-align: center;
+                margin-top: -0.75rem;
+                padding: 0 1rem 0.75rem 1rem;
+            }
+
+            .rfl-h1-strip h1 {
+                font-size: 40px;
+                text-transform: uppercase;
+                width: 100%;
+                max-width: 768px;
+                display: block;
+                margin: 0 auto;
+            }
+
+            .rfl-ticket {
+                margin: 0 auto;
+                max-width: 500px;
+                width: 100%;
+                font-family: "Karla", Arial, sans-serif;
+                padding: 1rem 1.25rem 2rem 1.25rem;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+            @media (max-width: 374px) {
+                .rfl-ticket {
+                    padding: 1rem 0.75rem 2rem 0.75rem;
+                }
+            }
+
+            @media (min-width: 768px) {
+                .rfl-ticket {
+                    width: 340px;
+                    background: #FFE15D;
+                    position: absolute;
+                    right: 3.5%;
+                    top: 0;
+                }
+
+                .logo-holder {
+                    background: #fff;
+                    max-width: 80%;
+                }
+            }
+
+            @media (min-width: 1024px) {
+                .rfl-ticket {
+                    right: 7%;
+                }
+            }
+
+            .logo-holder img {
+                width: 100%;
+            }
+
+            .logo-holder {
+                max-width: 280px;
+                margin: 0.5rem auto;
+            }
+
+            @media (max-width: 767px) {
+                .rfl-ticket-text {
+                    background: #fff;
+                    padding: 0 1rem 1rem 1rem;
+                    box-shadow: 1px 1px 8px 0 rgba(100, 100, 100, 0.2);
+                    margin-top: 1rem;
+                    margin-bottom: 0.25rem;
+                }
+
+                .pink-bg-mob {
+                    background: #FF6CB5;
+                    padding: 0 2px;
+                }
+            }
+
+            .rfl-ticket p {
+                margin: 0.5rem 0 0 0;
+                display: inline-block;
+            }
+
+            .rfl-text-larger {
+                font-size: 1.125rem;
+                font-weight: 800;
+            }
+
+            .rfl-text-smaller {
+                font-size: 0.935rem;
+            }
+
+            .rfl-text-bolder {
+                font-weight: 800;
+            }
+
+            @media (min-width: 768px) {
+                .rfl-banner-image {
+                    background: url('{!$Resource.Indigo_HR_Background}');
+                    background-repeat: no-repeat;
+                    background-position: 40%;
+                    background-size: cover;
+                    height: 300px;
+                    display: block;
+                }
+            }
+
+            .sign-up-exp {
+                max-width: 816px;
+                margin: 0 auto;
+                padding: 0 1.5rem;
+                line-height: 1.25;
+                box-sizing: border-box;
+                font-family: "Karla", Arial, sans-serif;
+                font-size: 1rem;
+                color: #44006E;
+            }
+
+            @media (min-width: 768px) {
+                .sign-up-exp p {
+                    width: 50%;
+                }
+            }
+
+            @media (min-width: 992px) {
+                .sign-up-exp p {
+                    width: 64%;
+                }
+            }
+
+            /*-------------------------------------------------*/
+
+            /* RFL Footer */
+
+            /*-------------------------------------------------*/
+
+            .rfl-footer {
+                background: #44D1B5;
+                padding: 3rem 0 2rem 0;
+            }
+
+            @media (min-width: 768px) {
+                .rfl-footer {
+                    padding: 3rem 0;
+                    margin-top: 3rem;
+                }
+            }
+
+            @media (min-width: 1024px) {
+                .rfl-footer {
+                    margin-top: 4rem;
+                }
+            }
+
+            .rfl-footer .logos a:last-child img {
+                margin-top: 10px;
+            }
+
+            .rfl-footer .logos img {
+                display: block;
+                margin: 0 auto;
+            }
+
+            @media (min-width: 500px) {
+                .rfl-footer .logos {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .rfl-footer .logos a {
+                    margin: 0 15px;
+                }
+
+                .rfl-footer .logos a:first-child img {
+                    margin-left: 70px;
+                }
+            }
+
+            .rfl-footer-content {
+                color: #fff;
+                font-family: "Karla", Arial, sans-serif;
+                max-width: 808px;
+                padding: 0 20px;
+                margin: 0 auto;
+                font-size: 1rem;
+                text-align: center;
+            }
+
+            .rfl-footer-content ul {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 1rem 4rem 1.5rem 4rem;
+            }
+
+            .rfl-footer-content li {
+                list-style: none;
+                margin: 0;
+            }
+
+            .list-spacer {
+                height: 1rem;
+                width: 1px;
+                background: #fff;
+                display: block;
+            }
+
+            .img-credit {
+                font-size: 0.8125rem;
+            }
+
+            @media (max-width: 767px) {
+                .rfl-footer-content ul {
+                    flex-wrap: wrap;
+                    font-size: 1rem;
+                    border-bottom: 1px solid #fff;
+                    border-top: 1px solid #fff;
+                    max-width: 200px;
+                    margin: 1.5rem auto;
+                    padding: 1rem;
+                    box-sizing: border-box;
+                }
+
+                .rfl-footer-content li {
+                    width: 100%;
+                    padding: 0.25rem 0;
+                }
+
+                .list-spacer {
+                    display: none;
+                }
+            }
+
+            .rfl-no-underline-link a,
+            .rfl-no-underline-link a:active,
+            .rfl-no-underline-link a:hover,
+            .rfl-no-underline-link a:visited {
+                color: #fff;
+                font-weight: 800;
+                text-decoration: none;
+            }
+        </style>
+
+        <!-- Header -->
+        <div class="rfl-header">
+            <div class="rfl-banner-image"></div>
+            <div class="rfl-h1-strip">
+                <h1>
+                    <span class="outline">Indigo Training Sign Up Form</span>
+                </h1>
+            </div>
+        </div>
+
+        <!-- Explanation -->
+        <div class="sign-up-exp">
+            <p>
+            </p>
+        </div>
+
+        <!-- LWC Container -->
+        <div class="FlowContainer slds-card__body">
+            <div id="rfl-signup" />
+        </div>
+
+        <!-- Footer -->
+
+        <div style=" background-color:#f1f2f2; ">
+
+            <center>
+
+                <img style="width: 100%; max-width: 600px;" src="https://c.eu43.content.force.com/servlet/servlet.ImageServer?id=01569000007vu9L&oid=00D1r000002cPn9&lastMod=1615309101000"
+                />
+
+                <p>
+                    <a style="font-size:12px;" href="https://www.indigovolunteers.org/donate">Donate to Indigo
+                    </a>
+                </p>
+
+                <a style="text-decoration:none" href="https://www.facebook.com/indigovolunteers/">
+                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5sK&oid=00D1r000002cPn9&lastMod=1590070083000"
+                        alt="Facebook" style="border: none;" height="24" width="24" />
+                </a>
+
+                <span>&nbsp;&nbsp;</span>
+                <a style="text-decoration:none" href="https://www.instagram.com/indigovolunteers/">
+                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5vt&oid=00D1r000002cPn9&lastMod=1590070302000"
+                        alt="Twitter" style="border: none;" height="24" width="24" />
+                </a>
+
+                <span>&nbsp;&nbsp;</span>
+                <a style="text-decoration:none" href="http://www.twitter.com/indigovolunteer" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable">
+                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5sa&oid=00D1r000002cPn9&lastMod=1590070202000"
+                        alt="Instagram" style="border: none;" height="24" width="24" />
+                </a>
+
+                <span>&nbsp;&nbsp;</span>
+                <a style="text-decoration:none" href="https://www.linkedin.com/company/indigo-volunteers" target="_blank" rel="noopener noreferrer"
+                    data-auth="NotApplicable">
+                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5xF&oid=00D1r000002cPn9&lastMod=1590070328000"
+                        alt="LinkedIn" style="border: none;" height="24" width="24" />
+                </a>
+
+            </center>
+
+        </div>
+
+        <!-- Lightning Web Component -->
+        <script>
+
+            /*
+        Use Lightning Web Components in Visualforce Pages
+
+        https://developer.salesforce.com/docs/component-library/documentation/en/lwc/lwc.use_visualforce
+
+        */
+
+            /*
+                Dynamically Creating Components
+
+                https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/js_cb_dynamic_cmp_async.htm
+
+                The syntax is:
+                    $A.createComponent(String type, Object attributes, function callback)
+
+                    type—The type of component to create; for example, "lightning:button".
+                    attributes—A map of attributes for the component, including the local Id (aura:id).
+                    callback(cmp, status, errorMessage)—The callback to invoke after the component is created.
+
+                    The callback has three parameters.
+
+                    cmp—The component that was created. This enables you to do something with the new component, such as add it to the body of the component that creates it. If there’s an error, cmp is null.
+                    status—The status of the call. The possible values are SUCCESS, INCOMPLETE, or ERROR. Always check that the status is SUCCESS before you try to use the component.
+                    errorMessage—The error message if the status is ERROR.
+            */
+
+            var campaignParam = "{!$CurrentPage.parameters.campaign}"; 
+
+            /* Create the top-level RunForLoveHome Lightning Web Component */
+
+            $Lightning.use("c:INDIGO_TRN_App", function () {
+                $Lightning.createComponent("c:indTrnSignupFormMain",
+                    { pageCampaignName: campaignParam },
+                    "rfl-signup",
+                    function (cmp) {
+                        console.log("indTrnSignupFormMain was created");
+                        // do some stuff
+                    }
+                );
+            });
+
+        </script>
+        <div id="auraErrorMessage"></div>
+        <!--render facet: 5:0-->
+    </body>
+
+</apex:page>

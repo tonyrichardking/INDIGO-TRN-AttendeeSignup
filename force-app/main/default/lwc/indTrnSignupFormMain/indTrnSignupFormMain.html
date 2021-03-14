@@ -1,0 +1,81 @@
+<template>
+
+    <!-- Contact details form-->
+    <template if:true={showSignup}>
+        <lightning-tile>
+            <div class="rfl-signup-header">
+                <p>Sign up here to register for one of our training sessions from the {pageCampaignName} season. Once
+                    you have completed this form you will receive an email containing more information and a Zoom link.
+                </p>
+            </div>
+
+            <!-- Input boxes to enter the Contact details -->
+            <div class="rfl-signup-inputs">
+                <lightning-input type="text" label="First Name" required onchange={handleFirstname}></lightning-input>
+                <lightning-input type="text" label="Last Name" required onchange={handleLastname}></lightning-input>
+                <lightning-input type="email" label="Email" required onchange={handleEmail}></lightning-input>
+
+                <lightning-combobox name="organisation"
+                    label="If you work for one of our partner organisations, please choose which one, or if not, select 'None'"
+                    value="" placeholder="Please Select One" options={theRandMPartners}
+                    onchange={handleRandMJobSelection} required></lightning-combobox>
+
+                <lightning-combobox name="trainingCourses" label="Which training course would you like to sign up for?"
+                    value="" placeholder="Please Select One" options={theCourses} onchange={handleCourseSelection}
+                    required></lightning-combobox>
+
+                <div class="rfl-log-tile">
+                    <lightning-input type="checkbox" label="Show More Details." onchange={handleMoreDetails}>
+                    </lightning-input>
+                    <template if:true={theEnableMoreDetails}>
+                        <template if:true={theSelectedVolHours}>
+                            <lightning-card title="Course Details" icon-name="">
+                                <div class="slds-grid slds-grid_vertical">
+                                    <div class="slds-col slds-size_1-of-2">
+                                        <p>{theSelectedVolHours.Session__c}</p>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-2">
+                                        <p>{theSelectedVolHours.Session_Description__c}</p>
+                                    </div>
+                                </div>
+                            </lightning-card>
+                        </template>
+                    </template>
+                </div>
+
+                <lightning-combobox name="newsletterAgreement"
+                    label="Would you like to receive monthly newsletter updates from Indigo Volunteers? Each month we share resources and updates, you can unsubscribe at any time ."
+                    value="" placeholder="You must select 'Yes' or 'No' to proceed" options={newsletterOptions}
+                    onchange={handleNewsletterAgreement} required></lightning-combobox>
+
+                <lightning-combobox name="gdprAgreement"
+                    label="I agree to Indigo Volunteers holding and processing my data in line with Indigo Volunteer’s Privacy Policy and Data Protection Policy."
+                    value="" placeholder="You must select 'I Agree' to proceed" options={gdprOptions}
+                    onchange={handleGdprAgreement} required></lightning-combobox>
+
+                <template if:true={showRequiredError}>
+                    <div class="rfl-signup-errormessage">
+                        <p>Please enter values for all the input boxes.</p>
+                    </div>
+                </template>
+
+                <!-- Button to update the Contact details -->
+                <lightning-button variant="Success" label="Save" title="Save" icon-name="utility:save"
+                    class="slds-m-left_x-small" onclick={handleSave}></lightning-button>
+            </div>
+        </lightning-tile>
+    </template>
+
+    <template if:false={showSignup}>
+
+        <!-- Thank You -->
+        <lightning-tile title="Thank You">
+            <div class="rfl-signup-thankyou">
+                <p>Thank you for registering for "{theSelectedCourseValue}" {theFirstname}!</p>
+                <p>You should receive an email with more information and your Zoom link within a day. If you do not
+                    please check your 'spam' folder.</p>
+            </div>
+        </lightning-tile>
+
+    </template>
+</template>
