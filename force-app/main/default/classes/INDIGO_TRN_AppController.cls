@@ -119,19 +119,37 @@ public without sharing class INDIGO_TRN_AppController
 
     // --------------------------------------------------------------------------------
     @AuraEnabled(cacheable=true)
-    public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForCampaign(string campaignName) 
+    public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForRecordTypeFromDate(string recordType, Integer dd, Integer mm, Integer yyyy) 
     {
-        //system.debug('ReadVolunteerHoursForRecordTypeId: volHoursId = ' + volHoursId);
+        Date fromDate = Date.newInstance(yyyy, mm, dd);
+
+        system.debug('ReadVolunteerHoursForRecordTypeFromDate: recordType = ' + recordType + 'date = ' + fromDate.day() + '/' + fromDate.month() + '/' + fromDate.year());       
     
         return [
             SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                     Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
-                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c
+                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c, RecordTypeId
             FROM GW_Volunteers__Volunteer_Hours__c
-            WHERE GW_Volunteers__Volunteer_Campaign_Name__c =: campaignName
+            WHERE RecordTypeId =: recordType AND GW_Volunteers__Start_Date__c >= :fromDate
             //WITH SECURITY_ENFORCED
         ];
     }  
+
+        // --------------------------------------------------------------------------------
+        @AuraEnabled(cacheable=true)
+        public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForCampaign(string campaignName) 
+        {
+            //system.debug('ReadVolunteerHoursForCampaign: volHoursId = ' + volHoursId);
+        
+            return [
+                SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
+                        Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
+                        GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c
+                FROM GW_Volunteers__Volunteer_Hours__c
+                WHERE GW_Volunteers__Volunteer_Campaign_Name__c =: campaignName
+                //WITH SECURITY_ENFORCED
+            ];
+        }  
 
     // --------------------------------------------------------------------------------
     @AuraEnabled(cacheable=false)

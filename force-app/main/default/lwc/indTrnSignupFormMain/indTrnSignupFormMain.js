@@ -4,11 +4,14 @@ import { reduceErrors } from "c/ldsUtils";
 
 import EnsureContact from "@salesforce/apex/INDIGO_TRN_AppController.EnsureContact";
 import ReadVolunteerHoursForCampaign from "@salesforce/apex/INDIGO_TRN_AppController.ReadVolunteerHoursForCampaign";
+import ReadVolunteerHoursForRecordTypeFromDate from "@salesforce/apex/INDIGO_TRN_AppController.ReadVolunteerHoursForRecordTypeFromDate";
 import ReadJobsForCampaignId from "@salesforce/apex/INDIGO_TRN_AppController.ReadJobsForCampaignId";
 import ReadCampaignForName from "@salesforce/apex/INDIGO_TRN_AppController.ReadCampaignForName";
 import EnsureAttendeeForContactAndVolHours from "@salesforce/apex/INDIGO_TRN_AppController.EnsureAttendeeForContactAndVolHours";
 
 const theRandMCampaignName = "R and M Partners";
+const courseFromDate = '01/04/2020';
+const trainingRecordTypeId = '0121r000000iitHAAQ';
 
 export default class IndTrnSignupFormMain extends LightningElement {
     showSignup = true;
@@ -27,11 +30,25 @@ export default class IndTrnSignupFormMain extends LightningElement {
     error;
     errorMessage = 'Error message undefined';
 
+    theDateToday;
+
     // --------------------------------------------------------------------------------
     // initialisation
     //
     connectedCallback() {
-        this.initialiseCourses();
+
+        // set up debugging
+
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();  
+        this.theDateToday = dd + '/' + mm + '/' + yyyy;
+
+        // initialise the drop-downs
+
+        //this.initialiseCoursesForCampaign();
+        this.initialiseAllCoursesForFromDate();
         this.initialiseOrganisations();
     }
 
@@ -131,7 +148,28 @@ export default class IndTrnSignupFormMain extends LightningElement {
         return this.theCourseOptions;
     }
 
-    initialiseCourses() {
+    initialiseAllCoursesForFromDate() {
+        ReadVolunteerHoursForRecordTypeFromDate({ recordType: trainingRecordTypeId, dd: 1,  mm: 4, yyyy: 2020})
+            .then((result) => {
+                if (result != null) {
+                    this.theCourseVolHoursList = result;
+                    this.theCourseOptions = this.buildCourseOptions(
+                        this.theCourseVolHoursList
+                    );
+                    this.errorMessage = 'result OK';
+                }
+                else {
+                    this.theCourseVolHoursList = undefined;
+                    this.errorMessage = 'result was null;'
+                }
+            })
+            .catch(error => {
+                this.error = error;
+                this.errorMessage = reduceErrors(error);
+            });
+    }
+
+    initialiseCoursesForCampaign() {
         ReadVolunteerHoursForCampaign({ campaignName: this.pageCampaignName })
             .then((result) => {
                 if (result != null) {
@@ -201,7 +239,9 @@ export default class IndTrnSignupFormMain extends LightningElement {
     }
 
     // --------------------------------------------------------------------------------
-    // Handle the inputs
+    // Handle the name and inputs
+    //
+
     handleFirstname(event) {
         // alert('handleFirstname: theFirstname = ' + event.target.value);
         this.theFirstname = event.target.value;
@@ -218,7 +258,8 @@ export default class IndTrnSignupFormMain extends LightningElement {
     }
 
     // --------------------------------------------------------------------------------
-    // GDPR agreement and newsletter signup.
+    // Handle the GDPR agreement and newsletter signup inputs.
+    //
 
     get gdprOptions() {
         return [{ label: "I Agree", value: "agree" }];
@@ -245,6 +286,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     // Save the signup information.
     // If the Contact exists use it; create a new one otherwise.
     // If a Volunteer Hours exists for a 'Run For Love' do no more; create one and a home page otherwise
+    //
 
     theNewAttendee;
 
