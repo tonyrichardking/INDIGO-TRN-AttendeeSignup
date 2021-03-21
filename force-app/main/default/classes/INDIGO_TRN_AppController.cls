@@ -123,12 +123,13 @@ public without sharing class INDIGO_TRN_AppController
     {
         Date fromDate = Date.newInstance(yyyy, mm, dd);
 
-        system.debug('ReadVolunteerHoursForRecordTypeFromDate: recordType = ' + recordType + 'date = ' + fromDate.day() + '/' + fromDate.month() + '/' + fromDate.year());       
+        //system.debug('ReadVolunteerHoursForRecordTypeFromDate: recordType = ' + recordType + 'date = ' + fromDate.day() + '/' + fromDate.month() + '/' + fromDate.year());       
     
         return [
             SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                     Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
-                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c, RecordTypeId
+                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c, 
+                    RecordTypeId, Zoom_Session_Details__c
             FROM GW_Volunteers__Volunteer_Hours__c
             WHERE RecordTypeId =: recordType AND GW_Volunteers__Start_Date__c >= :fromDate
             //WITH SECURITY_ENFORCED
@@ -144,7 +145,8 @@ public without sharing class INDIGO_TRN_AppController
             return [
                 SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                         Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
-                        GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c
+                        GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c,
+                        RecordTypeId, Zoom_Session_Details__c
                 FROM GW_Volunteers__Volunteer_Hours__c
                 WHERE GW_Volunteers__Volunteer_Campaign_Name__c =: campaignName
                 //WITH SECURITY_ENFORCED
@@ -265,14 +267,15 @@ public without sharing class INDIGO_TRN_AppController
 
     // --------------------------------------------------------------------------------
     @AuraEnabled(cacheable=false)
-    public static Attendee__c EnsureAttendeeForContactAndVolHours(string contactId, string volHoursId) 
+    public static Attendee__c EnsureAttendeeForContactAndVolHours(string contactId, string volHoursId, string zoomDetails) 
     {
-        //system.debug('EnsureAttendeeForContactAndVolHours: contactId = ' + contactId + 'volHoursId = ' + volHoursId);
+        system.debug('EnsureAttendeeForContactAndVolHours: contactId = ' + contactId + 'volHoursId = ' + volHoursId);
 
         Attendee__c newAttendee = new Attendee__c();
         newAttendee.Attendee_Name__c = contactId;
         newAttendee.Training_Consulting_Therapy_Session__c = volHoursId;
         newAttendee.Attendee_Status__c = 'Registered';
+        newAttendee.T4R_Zoom_Session_Details__c = zoomDetails;
         
         try 
         {

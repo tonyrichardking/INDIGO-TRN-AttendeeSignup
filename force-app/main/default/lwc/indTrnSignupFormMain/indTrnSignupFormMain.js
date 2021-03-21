@@ -319,7 +319,8 @@ export default class IndTrnSignupFormMain extends LightningElement {
                 .then((result) => {
                     EnsureAttendeeForContactAndVolHours({
                         contactId: result.Id,
-                        volHoursId: this.theSelectedVolHours.Id
+                        volHoursId: this.theSelectedVolHours.Id,
+                        zoomDetails: this.theSelectedVolHours.Zoom_Session_Details__c
                     }).then((result) => {
                         if (result != null) {
                             this.theNewAttendee = result;
