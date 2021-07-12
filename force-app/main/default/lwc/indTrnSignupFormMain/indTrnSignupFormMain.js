@@ -3,15 +3,13 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import { reduceErrors } from "c/ldsUtils";
 
 import EnsureContact from "@salesforce/apex/INDIGO_TRN_AppController.EnsureContact";
-import ReadVolunteerHoursForCampaign from "@salesforce/apex/INDIGO_TRN_AppController.ReadVolunteerHoursForCampaign";
-import ReadVolunteerHoursForRecordTypeFromDate from "@salesforce/apex/INDIGO_TRN_AppController.ReadVolunteerHoursForRecordTypeFromDate";
+import ReadJobsForCampaign from "@salesforce/apex/INDIGO_TRN_AppController.ReadJobsForCampaign";
+import ReadVolunteerHoursForJobFromDate from "@salesforce/apex/INDIGO_TRN_AppController.ReadVolunteerHoursForJobFromDate";
 import ReadJobsForCampaignId from "@salesforce/apex/INDIGO_TRN_AppController.ReadJobsForCampaignId";
 import ReadCampaignForName from "@salesforce/apex/INDIGO_TRN_AppController.ReadCampaignForName";
 import EnsureAttendeeForContactAndVolHours from "@salesforce/apex/INDIGO_TRN_AppController.EnsureAttendeeForContactAndVolHours";
 
 const theRandMCampaignName = "R and M Partners";
-const courseFromDate = '01/04/2020';
-const trainingRecordTypeId = '0121r000000iitHAAQ';
 
 export default class IndTrnSignupFormMain extends LightningElement {
     showSignup = true;
@@ -31,6 +29,11 @@ export default class IndTrnSignupFormMain extends LightningElement {
     errorMessage = 'Error message undefined';
 
     theDateToday;
+    theLastEditedDate = '12/7/2021';
+
+    dd;
+    mm;
+    yyyy;
 
     // --------------------------------------------------------------------------------
     // initialisation
@@ -40,15 +43,14 @@ export default class IndTrnSignupFormMain extends LightningElement {
         // set up debugging
 
         var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-        var yyyy = today.getFullYear();  
-        this.theDateToday = dd + '/' + mm + '/' + yyyy;
+        this.dd = String(today.getDate()).padStart(2, '0');
+        this.mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        this.yyyy = today.getFullYear();
+        this.theDateToday = this.dd + '/' + this.mm + '/' + this.yyyy;
 
         // initialise the drop-downs
 
-        //this.initialiseCoursesForCampaign();
-        this.initialiseAllCoursesForFromDate();
+        this.initialiseCoursesForCampaign();
         this.initialiseOrganisations();
     }
 
@@ -137,50 +139,29 @@ export default class IndTrnSignupFormMain extends LightningElement {
     }
 
     // --------------------------------------------------------------------------------
-    // List of courses.
+    // List of courses (Volunteer Jobs).
     //
-    theCourseVolHoursList;
-    theCourseOptions;
+    theJobCourseList;
+    theCourseDetails;
     theSelectedCourseValue = "";
-    theSelectedVolHours; // the selected training session (Volunteer Hours)
+    theSelectedJob;                     // the selected training course (Volunteer Job)
 
     get theCourses() {
-        return this.theCourseOptions;
-    }
-
-    initialiseAllCoursesForFromDate() {
-        ReadVolunteerHoursForRecordTypeFromDate({ recordType: trainingRecordTypeId, dd: 1,  mm: 4, yyyy: 2020})
-            .then((result) => {
-                if (result != null) {
-                    this.theCourseVolHoursList = result;
-                    this.theCourseOptions = this.buildCourseOptions(
-                        this.theCourseVolHoursList
-                    );
-                    this.errorMessage = 'result OK';
-                }
-                else {
-                    this.theCourseVolHoursList = undefined;
-                    this.errorMessage = 'result was null;'
-                }
-            })
-            .catch(error => {
-                this.error = error;
-                this.errorMessage = reduceErrors(error);
-            });
+        return this.theCourseDetails;
     }
 
     initialiseCoursesForCampaign() {
-        ReadVolunteerHoursForCampaign({ campaignName: this.pageCampaignName })
+        ReadJobsForCampaign({ campaignName: this.pageCampaignName })
             .then((result) => {
                 if (result != null) {
-                    this.theCourseVolHoursList = result;
-                    this.theCourseOptions = this.buildCourseOptions(
-                        this.theCourseVolHoursList
+                    this.theJobCourseList = result;
+                    this.theCourseDetails = this.buildCourseDetails(
+                        this.theJobCourseList
                     );
                     this.errorMessage = 'result OK';
                 }
                 else {
-                    this.theCourseVolHoursList = undefined;
+                    this.theJobCourseList = undefined;
                     this.errorMessage = 'result was null;'
                 }
             })
@@ -190,7 +171,110 @@ export default class IndTrnSignupFormMain extends LightningElement {
             });
     }
 
-    buildCourseOptions(volHours) {
+    buildCourseDetails(volJob) {
+        var options = [];
+
+        Object.values(volJob).forEach((volJob) => {
+            options.push({
+                label: volJob.Name,
+                value: volJob.Name
+            });
+        });
+
+        options.sort(function (a, b) {
+            var nameA = a.label.toUpperCase(); // ignore upper and lowercase
+            var nameB = b.label.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+                return -1; //nameA comes first
+            }
+            if (nameA > nameB) {
+                return 1; // nameB comes first
+            }
+
+            return 0;  // names must be equal
+        });
+
+        return options;
+    }
+
+    handleCourseSelection(event) {
+        // set the selected session
+        this.theSelectedCourseValue = event.detail.value;
+
+        // find the vol hours for the selected session
+        this.theSelectedJob = this.theJobCourseList.find(
+            (v) => v.Name === this.theSelectedCourseValue
+        );
+
+        this.initialiseAllSessionsForJobFromDate();
+
+        //alert('handleCourseSelection: course = ' + this.theSelectedJob.Name);
+    }
+
+    // --------------------------------------------------------------------------------
+    // List of sessions (Volunteer Hours).
+    //
+    theSessionVolHoursList;
+    theSessionDetails;
+    theSelectedSessionValue = "";
+    theSelectedVolHours = null;         // the selected training session (Volunteer Hours)
+    hasMultipleSessions = false;
+
+    get theStartTime() {
+        if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
+            const timeInMillisecs = this.theSelectedVolHours.Start_Time__c;
+            const date = new Date(timeInMillisecs);
+            var hh = String(date.getHours()-1).padStart(2, '0');
+            var mm = String(date.getMinutes()).padStart(2, '0');
+
+            return hh + ':' + mm;
+        }
+
+        return "";
+    }
+
+    get theStartDateTime() {
+        if (this.theSelectedVolHours && this.theSelectedVolHours.GW_Volunteers__Start_Date__c) {
+            const date = new Date(this.theSelectedVolHours.GW_Volunteers__Start_Date__c);
+
+            return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "   " + this.theStartTime;
+        }
+
+        return "";
+    }
+
+    get theSessions() {
+        return this.theSessionDetails;
+    }
+
+    initialiseAllSessionsForJobFromDate() {
+        ReadVolunteerHoursForJobFromDate({ jobId: this.theSelectedJob.Id, dd: this.dd, mm: this.mm, yyyy: this.yyyy })
+            .then((result) => {
+                if (result != null) {
+                    this.theSessionVolHoursList = result;
+                    this.theSessionDetails = this.buildSessionDetails(
+                        this.theSessionVolHoursList
+                    );
+                    this.errorMessage = 'result OK';
+                }
+                else {
+                    this.theSessionVolHoursList = undefined;
+                    this.errorMessage = 'result was null;';
+                }
+            })
+            .then(() => {
+                // if there are more than one session for this course enable the session drop-down to select a session.
+                // If there is only one then select the first (and only) session in the list.
+                this.hasMultipleSessions = (this.theSessionVolHoursList.length > 1) ? true : false;
+                this.theSelectedVolHours = (this.hasMultipleSessions) ? null : this.theSessionVolHoursList[0];
+            })
+            .catch(error => {
+                this.error = error;
+                this.errorMessage = reduceErrors(error);
+            });
+    }
+
+    buildSessionDetails(volHours) {
         var options = [];
 
         Object.values(volHours).forEach((volHour) => {
@@ -216,16 +300,16 @@ export default class IndTrnSignupFormMain extends LightningElement {
         return options;
     }
 
-    handleCourseSelection(event) {
+    handleSessionSelection(event) {
         // set the selected session
-        this.theSelectedCourseValue = event.detail.value;
+        this.theSelectedSessionValue = event.detail.value;
 
         // find the vol hours for the selected session
-        this.theSelectedVolHours = this.theCourseVolHoursList.find(
-            (v) => v.Session__c === this.theSelectedCourseValue
+        this.theSelectedVolHours = this.theSessionVolHoursList.find(
+            (v) => v.Session__c === this.theSelectedSessionValue
         );
 
-        //alert('handleCourseSelection: session = ' + this.theSelectedVolHours.Session_Description__c);
+        //alert('handleSessionSelection: session = ' + this.theSelectedVolHours.Session_Description__c);
     }
 
     // --------------------------------------------------------------------------------
@@ -285,7 +369,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     // --------------------------------------------------------------------------------
     // Save the signup information.
     // If the Contact exists use it; create a new one otherwise.
-    // If a Volunteer Hours exists for a 'Run For Love' do no more; create one and a home page otherwise
+    // Create a new Attendee record (junction object connecting a Contact to a Session/Voluntee Hours)
     //
 
     theNewAttendee;
@@ -301,7 +385,6 @@ export default class IndTrnSignupFormMain extends LightningElement {
             this.theFirstname == "" ||
             this.theLastname == "" ||
             this.theEmail == "" ||
-            this.theMiles == "" ||
             this.gdprValue == "" ||
             this.newsletterValue == ""
         ) {
@@ -320,14 +403,15 @@ export default class IndTrnSignupFormMain extends LightningElement {
                     EnsureAttendeeForContactAndVolHours({
                         contactId: result.Id,
                         volHoursId: this.theSelectedVolHours.Id,
-                        zoomDetails: this.theSelectedVolHours.Zoom_Session_Details__c
+                        zoomDetails: this.theSelectedVolHours.Zoom_Session_Details__c,
+                        zoomUrl: this.theSelectedVolHours.T4R_TRN_Zoom_Session_URL__c
                     }).then((result) => {
                         if (result != null) {
                             this.theNewAttendee = result;
                             this.dispatchEvent(
                                 new ShowToastEvent({
                                     title: "Success",
-                                    message: "You have been registered for " + this.theSelectedCourseValue,
+                                    message: "You have been registered for " + this.theSelectedSessionValue,
                                     variant: "success"
                                 }))
                         }

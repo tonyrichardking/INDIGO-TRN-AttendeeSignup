@@ -17,6 +17,13 @@
   border-top: 6px #ffe15d solid;
 }
 
+.rfl-signup-details {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+}
+
 .rfl-signup-thankyou {
   background: #fff;
   margin-top: 1rem;

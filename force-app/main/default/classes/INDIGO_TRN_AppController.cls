@@ -1,9 +1,7 @@
 //
 // Log
 //
-// 18/1/2021 changed to without sharing 
-// 18/1/2021 in GetHomePageForId set cacheable=true
-// 21/1/2021 added T4R_Run_For_Love_Scoreboard__c to GetHomePageForId
+//
 
 public without sharing class INDIGO_TRN_AppController 
 {
@@ -109,7 +107,7 @@ public without sharing class INDIGO_TRN_AppController
         return [
             SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                     Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
-                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c
+                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c, T4R_TRN_Zoom_Session_URL__c
             FROM GW_Volunteers__Volunteer_Hours__c
             WHERE Id =: volHoursId
             //WITH SECURITY_ENFORCED
@@ -121,37 +119,56 @@ public without sharing class INDIGO_TRN_AppController
     @AuraEnabled(cacheable=true)
     public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForRecordTypeFromDate(string recordType, Integer dd, Integer mm, Integer yyyy) 
     {
-        Date fromDate = Date.newInstance(yyyy, mm, dd);
-
         //system.debug('ReadVolunteerHoursForRecordTypeFromDate: recordType = ' + recordType + 'date = ' + fromDate.day() + '/' + fromDate.month() + '/' + fromDate.year());       
     
+        Date fromDate = Date.newInstance(yyyy, mm, dd);
+
         return [
             SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                     Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
                     GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c, 
-                    RecordTypeId, Zoom_Session_Details__c
+                    RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
             FROM GW_Volunteers__Volunteer_Hours__c
             WHERE RecordTypeId =: recordType AND GW_Volunteers__Start_Date__c >= :fromDate
             //WITH SECURITY_ENFORCED
         ];
     }  
 
-        // --------------------------------------------------------------------------------
-        @AuraEnabled(cacheable=true)
-        public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForCampaign(string campaignName) 
-        {
-            //system.debug('ReadVolunteerHoursForCampaign: volHoursId = ' + volHoursId);
+    // --------------------------------------------------------------------------------
+    @AuraEnabled(cacheable=true)
+    public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForCampaign(string campaignName) 
+    {
+        //system.debug('ReadVolunteerHoursForCampaign: volHoursId = ' + volHoursId);
         
-            return [
-                SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
-                        Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
-                        GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c,
-                        RecordTypeId, Zoom_Session_Details__c
-                FROM GW_Volunteers__Volunteer_Hours__c
-                WHERE GW_Volunteers__Volunteer_Campaign_Name__c =: campaignName
-                //WITH SECURITY_ENFORCED
-            ];
-        }  
+        return [
+            SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
+                    Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
+                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c,
+                    RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
+             FROM GW_Volunteers__Volunteer_Hours__c
+            WHERE GW_Volunteers__Volunteer_Campaign_Name__c =: campaignName
+            //WITH SECURITY_ENFORCED
+        ];
+    } 
+    
+    // --------------------------------------------------------------------------------
+    @AuraEnabled(cacheable=true)
+    public static List<GW_Volunteers__Volunteer_Hours__c> ReadVolunteerHoursForJobFromDate(string jobId, Integer dd, Integer mm, Integer yyyy) 
+    {
+        //system.debug('ReadVolunteerHoursForJob: jobId = ' + jobId);
+
+        Date fromDate = Date.newInstance(yyyy, mm, dd);
+            
+        return [
+            SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
+                    Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
+                    GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c,
+                    RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
+            FROM GW_Volunteers__Volunteer_Hours__c
+            WHERE GW_Volunteers__Volunteer_Job__c =: jobId AND GW_Volunteers__Start_Date__c >= :fromDate
+            //WITH SECURITY_ENFORCED
+        ];
+    }  
 
     // --------------------------------------------------------------------------------
     @AuraEnabled(cacheable=false)
@@ -254,11 +271,24 @@ public without sharing class INDIGO_TRN_AppController
         //system.debug('ReadJobsForCampaignId: campaignId = ' + campaignId);
         
         return [
-            SELECT Id, Name, GW_Volunteers__Campaign__c, Job_Contact__c, Organisation_Name__c
+            SELECT Id, Name, GW_Volunteers__Campaign__c, Job_Contact__c, Organisation_Name__c,
+                GW_Volunteers__Description__c, Project_Type__c
             FROM GW_Volunteers__Volunteer_Job__c
             WHERE GW_Volunteers__Campaign__c =: campaignId
             //WITH SECURITY_ENFORCED
         ];
+    }
+
+    // --------------------------------------------------------------------------------
+    @AuraEnabled(cacheable=true)
+    public static List<GW_Volunteers__Volunteer_Job__c> ReadJobsForCampaign(string campaignName) 
+    {
+        system.debug('ReadJobsForCampaign: campaignName = ' + campaignName);
+
+        Campaign campaign = ReadCampaignForName(campaignName);
+        List<GW_Volunteers__Volunteer_Job__c> jobs = ReadJobsForCampaignId(campaign.Id);
+            
+        return jobs;
     }
 
     //
@@ -267,15 +297,17 @@ public without sharing class INDIGO_TRN_AppController
 
     // --------------------------------------------------------------------------------
     @AuraEnabled(cacheable=false)
-    public static Attendee__c EnsureAttendeeForContactAndVolHours(string contactId, string volHoursId, string zoomDetails) 
+    public static Attendee__c EnsureAttendeeForContactAndVolHours(string contactId, string volHoursId, string zoomDetails, string zoomUrl) 
     {
-        system.debug('EnsureAttendeeForContactAndVolHours: contactId = ' + contactId + 'volHoursId = ' + volHoursId);
+        system.debug('EnsureAttendeeForContactAndVolHours: contactId = ' + contactId + 'volHoursId = ' + volHoursId 
+                + 'zoomDetails = ' + zoomDetails + 'zoomUrl = ' + zoomUrl);
 
         Attendee__c newAttendee = new Attendee__c();
         newAttendee.Attendee_Name__c = contactId;
         newAttendee.Training_Consulting_Therapy_Session__c = volHoursId;
         newAttendee.Attendee_Status__c = 'Registered';
         newAttendee.T4R_Zoom_Session_Details__c = zoomDetails;
+        newAttendee.T4R_TRN_Zoom_Session_URL__c = zoomUrl;
         
         try 
         {

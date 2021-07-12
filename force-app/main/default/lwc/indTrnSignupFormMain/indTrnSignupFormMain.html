@@ -1,58 +1,85 @@
 <template>
     <lightning-tile>
-        <p>Indigo Training Form Development: {theDateToday}</p>
+        <p>Indigo Training Form Development.</p>
+        <p>Campaign: {pageCampaignName}.</p>
+        <p>Date: {theDateToday}.</p>
+        <p>Last Edit: {theLastEditedDate}.</p>
     </lightning-tile>
 
     <!-- Contact details form-->
     <template if:true={showSignup}>
         <lightning-tile>
             <div class="rfl-signup-header">
-                <p>Sign up here to register for one of our training sessions from the {pageCampaignName} season. Once
-                    you have completed this form you will receive an email containing more information and a Zoom link.
-                </p>
+                <p>Are you interested in one of our training sessions? Sign up below and we’ll confirm via email!.</p>
             </div>
 
             <!-- Input boxes to enter the Contact details -->
             <div class="rfl-signup-inputs">
-                <lightning-input type="text" label="First Name" required onchange={handleFirstname}></lightning-input>
-                <lightning-input type="text" label="Last Name" required onchange={handleLastname}></lightning-input>
-                <lightning-input type="email" label="Email" required onchange={handleEmail}></lightning-input>
 
-                <lightning-combobox name="organisation"
-                    label="If you work for one of our partner organisations, please choose which one, or if not, select 'None'"
-                    value="" placeholder="Please Select One" options={theRandMPartners}
-                    onchange={handleRandMJobSelection} required></lightning-combobox>
-
-                <lightning-combobox name="trainingCourses" label="Which training course would you like to sign up for?"
+                <lightning-combobox name="trainingCourses" label="Which training would you like to sign up for?"
                     value="" placeholder="Please Select One" options={theCourses} onchange={handleCourseSelection}
-                    required></lightning-combobox>
+                    required>
+                </lightning-combobox>
+
+                <template if:true={hasMultipleSessions}>
+
+                    <lightning-combobox name="trainingSessions" label="Select the relevant session here:" value=""
+                        placeholder="Please Select One" options={theSessions} onchange={handleSessionSelection}
+                        required>
+                    </lightning-combobox>
+
+                </template>
 
                 <div class="rfl-log-tile">
-                    <lightning-input type="checkbox" label="Show More Details." onchange={handleMoreDetails}>
-                    </lightning-input>
-                    <template if:true={theEnableMoreDetails}>
-                        <template if:true={theSelectedVolHours}>
-                            <lightning-card title="Course Details" icon-name="">
-                                <div class="slds-grid slds-grid_vertical">
-                                    <div class="slds-col slds-size_1-of-2">
-                                        <p>{theSelectedVolHours.Session__c}</p>
+                    <template if:true={theSelectedVolHours}>
+                        <lightning-card title="Details" icon-name="">
+                            <div class="slds-grid slds-grid_vertical">
+
+                                <div class="rfl-signup-details">
+                                    <div class="slds-col">
+                                        <p><strong>Start Date and Time: </strong>{theStartDateTime}</p>
                                     </div>
-                                    <div class="slds-col slds-size_2-of-2">
-                                        <p>{theSelectedVolHours.Session_Description__c}</p>
+                                    <div class="slds-col">
+                                        <p><strong>Description: </strong>{theSelectedVolHours.Session_Description__c}
+                                        </p>
                                     </div>
                                 </div>
-                            </lightning-card>
-                        </template>
+
+                                <p slot="footer"><i>Unfortunately, you can only sign up to one session at a time. In
+                                        case you’re interested in more than one session, simply fill in the form again!
+                                        We’re sorry about the inconvenience.</i></p>
+                            </div>
+                        </lightning-card>
                     </template>
                 </div>
 
+            </div>
+
+            <div class="rfl-signup-inputs">
+
+                <lightning-input type="text" label="First Name" required onchange={handleFirstname}></lightning-input>
+
+                <lightning-input type="text" label="Last Name" required onchange={handleLastname}></lightning-input>
+
+                <lightning-input type="email" label="Email" required onchange={handleEmail}></lightning-input>
+
+            </div>
+
+            <div class="rfl-signup-inputs">
+
+                <lightning-combobox name="organisation"
+                    label="Do you work for one of our partners? If no, please select ‘None" value=""
+                    placeholder="Please Select One" options={theRandMPartners} onchange={handleRandMJobSelection}
+                    required>
+                </lightning-combobox>
+
                 <lightning-combobox name="newsletterAgreement"
-                    label="Would you like to receive monthly newsletter updates from Indigo Volunteers? Each month we share resources and updates, you can unsubscribe at any time ."
-                    value="" placeholder="You must select 'Yes' or 'No' to proceed" options={newsletterOptions}
+                    label="Would you also like to receive our newsletters? You can change your mind any time!" value=""
+                    placeholder="You must select 'Yes' or 'No' to proceed" options={newsletterOptions}
                     onchange={handleNewsletterAgreement} required></lightning-combobox>
 
                 <lightning-combobox name="gdprAgreement"
-                    label="I agree to Indigo Volunteers holding and processing my data in line with Indigo Volunteer’s Privacy Policy and Data Protection Policy."
+                    label="I agree to the holding and processing of my data in line with Indigo Volunteer’s Privacy Policy and Data Protection Policy."
                     value="" placeholder="You must select 'I Agree' to proceed" options={gdprOptions}
                     onchange={handleGdprAgreement} required></lightning-combobox>
 
@@ -65,7 +92,9 @@
                 <!-- Button to update the Contact details -->
                 <lightning-button variant="Success" label="Save" title="Save" icon-name="utility:save"
                     class="slds-m-left_x-small" onclick={handleSave}></lightning-button>
+
             </div>
+
         </lightning-tile>
     </template>
 
