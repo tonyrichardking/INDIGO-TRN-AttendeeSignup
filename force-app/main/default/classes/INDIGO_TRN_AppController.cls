@@ -297,7 +297,7 @@ public without sharing class INDIGO_TRN_AppController
 
     // --------------------------------------------------------------------------------
     @AuraEnabled(cacheable=false)
-    public static Attendee__c EnsureAttendeeForContactAndVolHours(string contactId, string volHoursId, string zoomDetails, string zoomUrl) 
+    public static Attendee__c EnsureAttendeeForContactAndVolHours(string contactId, string volHoursId, string zoomDetails, string zoomUrl, string sessionDescription) 
     {
         system.debug('EnsureAttendeeForContactAndVolHours: contactId = ' + contactId + 'volHoursId = ' + volHoursId 
                 + 'zoomDetails = ' + zoomDetails + 'zoomUrl = ' + zoomUrl);
@@ -308,6 +308,7 @@ public without sharing class INDIGO_TRN_AppController
         newAttendee.Attendee_Status__c = 'Registered';
         newAttendee.T4R_Zoom_Session_Details__c = zoomDetails;
         newAttendee.T4R_TRN_Zoom_Session_URL__c = zoomUrl;
+        newAttendee.Training_Session_Description__c = sessionDescription;
         
         try 
         {

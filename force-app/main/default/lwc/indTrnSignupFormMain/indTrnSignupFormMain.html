@@ -7,10 +7,10 @@
     </lightning-tile>
 
     <!-- Contact details form-->
-    <template if:true={showSignup}>
+    <template if:true={enableFirstPage}>
         <lightning-tile>
             <div class="rfl-signup-header">
-                <p>Are you interested in one of our training sessions? Sign up below and we’ll confirm via email!.</p>
+                <p>Are you interested in one of our training sessions? Sign up below and we’ll confirm via email!</p>
             </div>
 
             <!-- Input boxes to enter the Contact details -->
@@ -53,60 +53,93 @@
                     </template>
                 </div>
 
-            </div>
+                <template if:false={assertSessionsAvailable}>
 
-            <div class="rfl-signup-inputs">
+                    <!-- No Sessions Available -->
+                    <lightning-tile title="No Sessions Available">
+                        <div class="rfl-signup-thankyou">
+                            <p>Unfortunately there are no sessions currently available for "{theSelectedCourseValue}".
+                                Please select another course.</p>
+                        </div>
+                    </lightning-tile>
 
-                <lightning-input type="text" label="First Name" required onchange={handleFirstname}></lightning-input>
-
-                <lightning-input type="text" label="Last Name" required onchange={handleLastname}></lightning-input>
-
-                <lightning-input type="email" label="Email" required onchange={handleEmail}></lightning-input>
-
-            </div>
-
-            <div class="rfl-signup-inputs">
-
-                <lightning-combobox name="organisation"
-                    label="Do you work for one of our partners? If no, please select ‘None" value=""
-                    placeholder="Please Select One" options={theRandMPartners} onchange={handleRandMJobSelection}
-                    required>
-                </lightning-combobox>
-
-                <lightning-combobox name="newsletterAgreement"
-                    label="Would you also like to receive our newsletters? You can change your mind any time!" value=""
-                    placeholder="You must select 'Yes' or 'No' to proceed" options={newsletterOptions}
-                    onchange={handleNewsletterAgreement} required></lightning-combobox>
-
-                <lightning-combobox name="gdprAgreement"
-                    label="I agree to the holding and processing of my data in line with Indigo Volunteer’s Privacy Policy and Data Protection Policy."
-                    value="" placeholder="You must select 'I Agree' to proceed" options={gdprOptions}
-                    onchange={handleGdprAgreement} required></lightning-combobox>
-
-                <template if:true={showRequiredError}>
-                    <div class="rfl-signup-errormessage">
-                        <p>Please enter values for all the input boxes.</p>
-                    </div>
                 </template>
 
-                <!-- Button to update the Contact details -->
-                <lightning-button variant="Success" label="Save" title="Save" icon-name="utility:save"
-                    class="slds-m-left_x-small" onclick={handleSave}></lightning-button>
-
             </div>
+
+            <template if:true={assertSessionsAvailable}>
+
+                <div class="rfl-signup-inputs">
+
+                    <lightning-input type="text" label="First Name" required onchange={handleFirstname}
+                        value={theFirstname}>
+                    </lightning-input>
+
+                    <lightning-input type="text" label="Last Name" required onchange={handleLastname}
+                        value={theLastname}></lightning-input>
+
+                    <lightning-input type="email" label="Email" required onchange={handleEmail} value={theEmail}>
+                    </lightning-input>
+
+                </div>
+
+                <div class="rfl-signup-inputs">
+
+                    <lightning-combobox name="organisation"
+                        label="Do you work for one of our partners? If no, please select ‘None"
+                        value={theSelectedRandMValue} placeholder="Please Select One" options={theRandMPartners}
+                        onchange={handleRandMJobSelection} required>
+                    </lightning-combobox>
+
+                    <lightning-combobox name="newsletterAgreement"
+                        label="Would you also like to receive our newsletters? You can change your mind any time!"
+                        value={newsletterValue} placeholder="You must select 'Yes' or 'No' to proceed"
+                        options={newsletterOptions} onchange={handleNewsletterAgreement} required></lightning-combobox>
+
+                    <lightning-combobox name="gdprAgreement"
+                        label="I agree to the holding and processing of my data in line with Indigo Volunteer’s Privacy Policy and Data Protection Policy."
+                        value={gdprValue} placeholder="You must select 'I Agree' to proceed" options={gdprOptions}
+                        onchange={handleGdprAgreement} required></lightning-combobox>
+
+                    <template if:true={showRequiredError}>
+                        <div class="rfl-signup-errormessage">
+                            <p>Please enter values for all the input boxes.</p>
+                        </div>
+                    </template>
+
+                    <!-- Button to update the Contact details -->
+                    <lightning-button variant="Success" label="Save" title="Save" icon-name="utility:save"
+                        class="slds-m-left_x-small" onclick={handleSave}></lightning-button>
+
+                </div>
+
+            </template>
 
         </lightning-tile>
     </template>
 
-    <template if:false={showSignup}>
+    <template if:false={enableFirstPage}>
 
         <!-- Thank You -->
         <lightning-tile title="Thank You">
+
             <div class="rfl-signup-thankyou">
                 <p>Thank you for registering for "{theSelectedCourseValue}" {theFirstname}!</p>
-                <p>You should receive an email with more information and your Zoom link within a day. If you do not
+                <p>You should receive an email with more information and your Zoom link within a day. If you do not,
                     please check your 'spam' folder.</p>
             </div>
+
+            <div class="rfl-signup-thankyou">
+
+                <p>If you want to sign up for another session you can click the button below.</p>
+
+                <!-- Button to sign up for another session -->
+                <lightning-button variant="Success" label="Sign up to another session." title="AnotherSession"
+                    icon-name="utility:save" class="slds-m-left_x-small" onclick={handleAnotherSession}>
+                </lightning-button>
+
+            </div>
+
         </lightning-tile>
 
     </template>

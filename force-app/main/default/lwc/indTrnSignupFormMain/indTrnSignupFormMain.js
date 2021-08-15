@@ -12,15 +12,8 @@ import EnsureAttendeeForContactAndVolHours from "@salesforce/apex/INDIGO_TRN_App
 const theRandMCampaignName = "R and M Partners";
 
 export default class IndTrnSignupFormMain extends LightningElement {
-    showSignup = true;
+    enableFirstPage = true;
     showRequiredError = false;
-
-    gdprValue = "";
-    newsletterValue = "";
-
-    theFirstname = "";
-    theLastname = "";
-    theEmail = "";
 
     @api pageCampaignName; // the name of the campaign from web page URL parameter
 
@@ -29,7 +22,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     errorMessage = 'Error message undefined';
 
     theDateToday;
-    theLastEditedDate = '12/7/2021';
+    theLastEditedDate = '14/8/2021';
 
     dd;
     mm;
@@ -52,6 +45,17 @@ export default class IndTrnSignupFormMain extends LightningElement {
 
         this.initialiseCoursesForCampaign();
         this.initialiseOrganisations();
+        this.initialiseAllStateForStartup();
+    }
+
+    initialiseAllStateForStartup(){
+        this.enableFirstPage = true;
+        this.hasMultipleSessions = false;
+        this.assertSessionsAvailable = true;
+        this.theEnableMoreDetails = false;        
+        this.theSelectedCourseValue = "";
+        this.theSelectedSessionValue = "";
+        this.theSelectedVolHours = null;
     }
 
     // --------------------------------------------------------------------------------
@@ -62,7 +66,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     theRandMJobsList;
     theRandMOptions;
     theSelectedRandMValue = "";
-    theSelectedRandMJob;               // the selected organisation (Volunteer Job)
+    theSelectedRandMJob;                // the selected organisation (Volunteer Job)
 
     get theRandMPartners() {
         return this.theRandMOptions;
@@ -218,7 +222,8 @@ export default class IndTrnSignupFormMain extends LightningElement {
     theSessionDetails;
     theSelectedSessionValue = "";
     theSelectedVolHours = null;         // the selected training session (Volunteer Hours)
-    hasMultipleSessions = false;
+    hasMultipleSessions = false;        // there are multiple sessions for this course (job)
+    assertSessionsAvailable = true;     // only allow signup if there are future sessions for this course (job)
 
     get theStartTime() {
         if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
@@ -267,6 +272,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
                 // If there is only one then select the first (and only) session in the list.
                 this.hasMultipleSessions = (this.theSessionVolHoursList.length > 1) ? true : false;
                 this.theSelectedVolHours = (this.hasMultipleSessions) ? null : this.theSessionVolHoursList[0];
+                this.assertSessionsAvailable = (this.theSessionVolHoursList.length > 0) ? true : false;
             })
             .catch(error => {
                 this.error = error;
@@ -323,8 +329,11 @@ export default class IndTrnSignupFormMain extends LightningElement {
     }
 
     // --------------------------------------------------------------------------------
-    // Handle the name and inputs
+    // Handle the contact info
     //
+    theFirstname = "";
+    theLastname = "";
+    theEmail = "";
 
     handleFirstname(event) {
         // alert('handleFirstname: theFirstname = ' + event.target.value);
@@ -344,6 +353,9 @@ export default class IndTrnSignupFormMain extends LightningElement {
     // --------------------------------------------------------------------------------
     // Handle the GDPR agreement and newsletter signup inputs.
     //
+
+    gdprValue = "";
+    newsletterValue = "";
 
     get gdprOptions() {
         return [{ label: "I Agree", value: "agree" }];
@@ -375,8 +387,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     theNewAttendee;
 
     handleSave() {
-        /*         alert('handleSave: Firstname = ' + this.theFirstname + ', Lastname = ' + this.theLastname + ', Email = '
-                            + this.theEmail + ', gdpr = ' + this.gdprValue + ', newsletter = ' + this.newsletterValue); */
+        //alert('handleSave: sessionDescription = ' + this.theSelectedVolHours.Session_Description__c);
 
         var selectAgreeGdpr = this.gdprValue == "agree" ? true : false;
         var selectAgreeNewsletter = this.newsletterValue == "yes" ? true : false;
@@ -404,7 +415,8 @@ export default class IndTrnSignupFormMain extends LightningElement {
                         contactId: result.Id,
                         volHoursId: this.theSelectedVolHours.Id,
                         zoomDetails: this.theSelectedVolHours.Zoom_Session_Details__c,
-                        zoomUrl: this.theSelectedVolHours.T4R_TRN_Zoom_Session_URL__c
+                        zoomUrl: this.theSelectedVolHours.T4R_TRN_Zoom_Session_URL__c,
+                        sessionDescription: this.theSelectedVolHours.Session_Description__c
                     }).then((result) => {
                         if (result != null) {
                             this.theNewAttendee = result;
@@ -424,7 +436,11 @@ export default class IndTrnSignupFormMain extends LightningElement {
 
             // change the component view
             this.showRequiredError = false;
-            this.showSignup = false;
+            this.enableFirstPage = false;
         }
+    }
+
+    handleAnotherSession(){
+        this.initialiseAllStateForStartup();
     }
 }

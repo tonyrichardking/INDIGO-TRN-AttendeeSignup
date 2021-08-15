@@ -3,24 +3,9 @@ private class INDIGO_TRN_AppTestClasses
 {
     // --------------------------------------------------------------------------------
     // Contacts
-    @isTest static void getContactForIdTest() 
-    {
-        Contact newContact = new Contact
-        (
-            Lastname = 'TestLastName',
-            Email = 'test@test.com'
-        );
-        insert newContact;
-        string newContactId = newContact.Id;
+    //
 
-        Test.starttest();        
-
-        Contact readContact = INDIGO_TRN_AppController.GetContactForId(newContactId);
-
-        Test.stoptest();
-    }
-
-    @isTest static void ensureContactTest() 
+    @isTest static void EnsureContactTest() 
     {
         Test.starttest();
 
@@ -31,8 +16,12 @@ private class INDIGO_TRN_AppTestClasses
 
     // --------------------------------------------------------------------------------
     // Volunteer Hours
-    @isTest static void EnsureVolHoursForJobTest() 
+    //
+
+    @isTest static void ReadVolunteerHoursForJobFromDateTest() 
     {
+        // Create Campaign
+
         Campaign newCampaign = new Campaign
         (
             Name = 'Test Campaign Name'
@@ -40,13 +29,17 @@ private class INDIGO_TRN_AppTestClasses
         insert(newCampaign);
         string newCampaignId = newCampaign.Id;
 
+        // Create Job
+
         GW_Volunteers__Volunteer_Job__c newJob = new GW_Volunteers__Volunteer_Job__c
         (
             Name = 'TestJob',
             GW_Volunteers__Campaign__c = newCampaignId
         );
-
         insert newJob;
+        string newJobId = newJob.Id;
+
+        // Create Contact
 
         Contact newContact = new Contact
         (
@@ -56,15 +49,35 @@ private class INDIGO_TRN_AppTestClasses
         insert newContact;
         string newContactId = newContact.Id;
 
+        // Create Volunteer Hours
+
+        Integer dd = 1;
+        Integer mm = 1;
+        Integer yyyy = 2021;
+        Date fromDate = Date.newInstance(yyyy, mm, dd);
+
+        GW_Volunteers__Volunteer_Hours__c newVolHours = new GW_Volunteers__Volunteer_Hours__c
+        (
+            GW_Volunteers__Contact__c = newContactId,
+            GW_Volunteers__Volunteer_Job__c = newJobId,
+            GW_Volunteers__Start_Date__c = fromDate
+        );
+        insert newVolHours;
+        string volHoursId = newVolHours.Id;  
+
+        // Test
+
         Test.starttest();
 
-        GW_Volunteers__Volunteer_Hours__c volHours = INDIGO_TRN_AppController.EnsureVolHoursForJob(newContactId, 'TestJob');
+        List<GW_Volunteers__Volunteer_Hours__c>  volHours = INDIGO_TRN_AppController.ReadVolunteerHoursForJobFromDate(newJobId, dd, mm, yyyy);
 
         Test.stoptest();
     }    
 
     // --------------------------------------------------------------------------------
     // Campaigns
+    //
+
     @isTest static void ReadCampaignForNameTest() 
     {
         Campaign newCampaign = new Campaign
@@ -78,7 +91,112 @@ private class INDIGO_TRN_AppTestClasses
         Campaign readCampaign = INDIGO_TRN_AppController.ReadCampaignForName('Test Campaign Name');
 
         Test.stoptest();
-    }      
+    }  
+    
+    // --------------------------------------------------------------------------------
+    // Jobs
+    //
+  
+    @isTest static void ReadJobsForCampaignTest() 
+    {
+        // Create Campaign
+
+        Campaign newCampaign = new Campaign
+        (
+            Name = 'Test Campaign Name'
+        );
+        insert(newCampaign);
+        string newCampaignId = newCampaign.Id;
+        string newCampaignName = newCampaign.Name;
+
+        // Create Job
+
+        GW_Volunteers__Volunteer_Job__c newJob = new GW_Volunteers__Volunteer_Job__c
+        (
+            Name = 'TestJob',
+            GW_Volunteers__Campaign__c = newCampaignId
+        );
+        insert newJob;
+        string newJobId = newJob.Id;
+
+        Test.starttest();
+
+        List<GW_Volunteers__Volunteer_Job__c> jobs = INDIGO_TRN_AppController.ReadJobsForCampaign(newCampaignName);
+
+        Test.stoptest();
+    }
+
+    @isTest static void ReadJobsForCampaignIdTest() 
+    {
+        // Create Campaign
+
+        Campaign newCampaign = new Campaign
+        (
+            Name = 'Test Campaign Name'
+        );
+        insert(newCampaign);
+        string newCampaignId = newCampaign.Id;
+        string newCampaignName = newCampaign.Name;
+
+        // Create Job
+
+        GW_Volunteers__Volunteer_Job__c newJob = new GW_Volunteers__Volunteer_Job__c
+        (
+            Name = 'TestJob',
+            GW_Volunteers__Campaign__c = newCampaignId
+        );
+        insert newJob;
+        string newJobId = newJob.Id;
+
+        Test.starttest();
+
+        List<GW_Volunteers__Volunteer_Job__c> jobs = INDIGO_TRN_AppController.ReadJobsForCampaignId(newCampaignId);
+
+        Test.stoptest();
+    } 
+
+    // --------------------------------------------------------------------------------
+    // Attendees
+    //
+
+    @isTest static void EnsureAttendeeForContactAndVolHoursTest() 
+    {
+        Campaign newCampaign = new Campaign
+        (
+            Name = 'Test Campaign Name'
+        );
+        insert(newCampaign);
+        string newCampaignId = newCampaign.Id;
+
+        GW_Volunteers__Volunteer_Job__c newJob = new GW_Volunteers__Volunteer_Job__c
+        (
+            Name = 'TestJob',
+            GW_Volunteers__Campaign__c = newCampaignId
+        );
+        insert newJob;
+
+        Contact newContact = new Contact
+        (
+            Lastname = 'TestLastName',
+            Email = 'test@test.com'
+        );
+        insert newContact;
+        string newContactId = newContact.Id;
+
+        GW_Volunteers__Volunteer_Hours__c volHours = INDIGO_TRN_AppController.EnsureVolHoursForJob(newContactId, 'TestJob');
+        string volHoursId = volHours.Id;
+
+        string zoomDetails = 'Test Zoom Details';
+        string zoomUrl = 'http://TestZoomUrl.com';
+        string sessionDescription = 'Test Session Description';
+
+        Test.starttest();
+
+        Attendee__c testAttendee = INDIGO_TRN_AppController.EnsureAttendeeForContactAndVolHours(newContactId, volHoursId, zoomDetails, zoomUrl, sessionDescription);
+
+        Test.stoptest();
+    }   
+}
 
 /*     
     // --------------------------------------------------------------------------------
@@ -182,7 +300,38 @@ private class INDIGO_TRN_AppTestClasses
         INDIGO_TRN_AppController.UpdateHomePage(homePageId, 999);
 
         Test.stoptest();
-    }   
+    } 
+    
+    @isTest static void ReadVolunteerHoursForJobFromDateTest() 
+    {
+        Campaign newCampaign = new Campaign
+        (
+            Name = 'Test Campaign Name'
+        );
+        insert(newCampaign);
+        string newCampaignId = newCampaign.Id;
+
+        GW_Volunteers__Volunteer_Job__c newJob = new GW_Volunteers__Volunteer_Job__c
+        (
+            Name = 'TestJob',
+            GW_Volunteers__Campaign__c = newCampaignId
+        );
+
+        insert newJob;
+
+        Contact newContact = new Contact
+        (
+            Lastname = 'TestLastName',
+            Email = 'test@test.com'
+        );
+        insert newContact;
+        string newContactId = newContact.Id;
+
+        Test.starttest();
+
+        List<GW_Volunteers__Volunteer_Hours__c>  volHours = INDIGO_TRN_AppController.ReadVolunteerHoursForJobFromDate(string jobId, Integer dd, Integer mm, Integer yyyy) 
+
+        Test.stoptest();
+    }  
     
     */
-}
