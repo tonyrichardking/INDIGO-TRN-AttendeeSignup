@@ -60,7 +60,8 @@ private class INDIGO_TRN_AppTestClasses
         (
             GW_Volunteers__Contact__c = newContactId,
             GW_Volunteers__Volunteer_Job__c = newJobId,
-            GW_Volunteers__Start_Date__c = fromDate
+            GW_Volunteers__Start_Date__c = fromDate,
+            T4R_TRN_Zoom_Session_URL__c = 'http://testzoomsession.com'
         );
         insert newVolHours;
         string volHoursId = newVolHours.Id;  
