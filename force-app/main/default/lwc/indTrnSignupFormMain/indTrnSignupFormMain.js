@@ -22,7 +22,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     errorMessage = 'Error message undefined';
 
     theDateToday;
-    theLastEditedDate = '14/8/2021';
+    theLastEditedDate = '3/4/2022';
 
     dd;
     mm;
