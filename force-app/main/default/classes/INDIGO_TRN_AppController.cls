@@ -71,7 +71,7 @@ public without sharing class INDIGO_TRN_AppController
             SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                     Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
                     GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c,
-                    RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
+                    Time_Zone__c, RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
             FROM GW_Volunteers__Volunteer_Hours__c
             WHERE GW_Volunteers__Volunteer_Job__c =: jobId AND GW_Volunteers__Start_Date__c >= :fromDate
             //WITH SECURITY_ENFORCED

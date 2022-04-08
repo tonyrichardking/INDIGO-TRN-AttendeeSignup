@@ -133,7 +133,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     // --------------------------------------------------------------------------------
     // List of courses (Volunteer Jobs).
     //
-    
+
     theJobCourseList;
     theCourseDetails;
     theSelectedCourseValue = "";
@@ -229,10 +229,10 @@ export default class IndTrnSignupFormMain extends LightningElement {
     }
 
     get theStartDateTime() {
-        if (this.theSelectedVolHours && this.theSelectedVolHours.GW_Volunteers__Start_Date__c) {
+        if (this.theSelectedVolHours && this.theSelectedVolHours.GW_Volunteers__Start_Date__c && this.theSelectedVolHours.Time_Zone__c) {
             const date = new Date(this.theSelectedVolHours.GW_Volunteers__Start_Date__c);
 
-            return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "   " + this.theStartTime;
+            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}   ${this.theStartTime}   ${this.theSelectedVolHours.Time_Zone__c}`;
         }
 
         return "";
