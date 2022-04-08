@@ -71,7 +71,7 @@ public without sharing class INDIGO_TRN_AppController
             SELECT Id, Name, GW_Volunteers__Contact__c, GW_Volunteers__Volunteer_Campaign__c,
                     Session__c, Session_Description__c, GW_Volunteers__Volunteer_Campaign_Name__c,
                     GW_Volunteers__Volunteer_Job__c, GW_Volunteers__Start_Date__c, Start_Time__c,
-                    RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
+                    Time_Zone__c, RecordTypeId, Zoom_Session_Details__c, T4R_TRN_Zoom_Session_URL__c
             FROM GW_Volunteers__Volunteer_Hours__c
             WHERE GW_Volunteers__Volunteer_Job__c =: jobId AND GW_Volunteers__Start_Date__c >= :fromDate
             //WITH SECURITY_ENFORCED
@@ -229,4 +229,33 @@ public without sharing class INDIGO_TRN_AppController
    
         return newAttendee;
     }  
+
+    //
+    // Partner Projects
+    //
+
+    // --------------------------------------------------------------------------------
+    @AuraEnabled(cacheable=true)
+    public static List<Partner_Project__c> ReadActivePartnerProjects() 
+    {
+        //system.debug('ReadActivePartnerProjects:');
+    
+        List<Partner_Project__c> partnerProjects = [
+            SELECT Id, Name, Activity_Status__c
+            FROM Partner_Project__c
+            //WHERE Activity_Status__c =: '🟢 Operational' OR  Activity_Status__c = '🔵 Onboarding'
+        ];
+
+        List<Partner_Project__c> activePartnerProjects = new List<Partner_Project__c>();
+
+        for (Partner_Project__c partnerProject : partnerProjects)
+        {
+            if (partnerProject.Activity_Status__c.contains('Operational') || partnerProject.Activity_Status__c.contains('Onboarding'))
+            {
+                activePartnerProjects.add(partnerProject);
+            }
+        }
+
+        return activePartnerProjects;
+    }
 }

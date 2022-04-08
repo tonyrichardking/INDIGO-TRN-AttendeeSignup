@@ -5,9 +5,8 @@ import { reduceErrors } from "c/ldsUtils";
 import EnsureContact from "@salesforce/apex/INDIGO_TRN_AppController.EnsureContact";
 import ReadJobsForCampaign from "@salesforce/apex/INDIGO_TRN_AppController.ReadJobsForCampaign";
 import ReadVolunteerHoursForJobFromDate from "@salesforce/apex/INDIGO_TRN_AppController.ReadVolunteerHoursForJobFromDate";
-import ReadJobsForCampaignId from "@salesforce/apex/INDIGO_TRN_AppController.ReadJobsForCampaignId";
-import ReadCampaignForName from "@salesforce/apex/INDIGO_TRN_AppController.ReadCampaignForName";
 import EnsureAttendeeForContactAndVolHours from "@salesforce/apex/INDIGO_TRN_AppController.EnsureAttendeeForContactAndVolHours";
+import ReadActivePartnerProjects from "@salesforce/apex/INDIGO_TRN_AppController.ReadActivePartnerProjects";
 
 const theRandMCampaignName = "R and M Partners";
 
@@ -22,7 +21,8 @@ export default class IndTrnSignupFormMain extends LightningElement {
     errorMessage = 'Error message undefined';
 
     theDateToday;
-    theLastEditedDate = '14/8/2021';
+    theLastEditedDate = '8/4/2022';
+    theTimeNow;
 
     dd;
     mm;
@@ -40,77 +40,64 @@ export default class IndTrnSignupFormMain extends LightningElement {
         this.mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         this.yyyy = today.getFullYear();
         this.theDateToday = this.dd + '/' + this.mm + '/' + this.yyyy;
+        this.theTimeNow = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
         // initialise the drop-downs
 
         this.initialiseCoursesForCampaign();
-        this.initialiseOrganisations();
         this.initialiseAllStateForStartup();
+        this.initialiseActivePartnerProjects();
     }
 
-    initialiseAllStateForStartup(){
+    initialiseAllStateForStartup() {
         this.enableFirstPage = true;
         this.hasMultipleSessions = false;
         this.assertSessionsAvailable = true;
-        this.theEnableMoreDetails = false;        
+        this.theEnableMoreDetails = false;
         this.theSelectedCourseValue = "";
         this.theSelectedSessionValue = "";
         this.theSelectedVolHours = null;
     }
 
     // --------------------------------------------------------------------------------
-    // List of R&M organisations.
+    // List of Partner Projects
     //
-    theRandMCampaign;
-    theRandMCampaignId;
-    theRandMJobsList;
-    theRandMOptions;
-    theSelectedRandMValue = "";
-    theSelectedRandMJob;                // the selected organisation (Volunteer Job)
 
-    get theRandMPartners() {
-        return this.theRandMOptions;
+    thePartnerProjectList;                      // the List<Partner_Project__c> returned from the controller
+    thePartnerProjectOptions;                   // the java array of partner project strings 
+    theSelectedPartnerProjectValue = "";        // the value returned from the partner project dropdown
+    theSelectedPartnerProject;                  // the partner project selected by the user
+
+    get thePartnerProjects() {                  // accessor used to populate the dropdown
+        return this.thePartnerProjectOptions;
     }
 
-    initialiseOrganisations() {
-        ReadCampaignForName({ campaignName: theRandMCampaignName })
+    // read the partner project objects which are "Operational" or "Onboarding"
+    initialiseActivePartnerProjects() {
+        ReadActivePartnerProjects()
             .then((result) => {
                 if (result != null) {
-                    this.theRandMCampaign = result;
-                    this.theRandMCampaignId = result.Id;
-                    this.errorMessage = 'result OK;'
+                    this.thePartnerProjectList = result;
+                    this.thePartnerProjectOptions = this.buildPartnerProjectOptions(this.thePartnerProjectList);
                 }
-                else {
-                    this.theRandMCampaign = undefined;
-                    this.errorMessage = 'result was null;'
-                }
-            })
-            .then((result) => {
-                ReadJobsForCampaignId({ campaignId: this.theRandMCampaignId })
-                    .then((result) => {
-                        if (result != null) {
-                            this.theRandMJobsList = result;
-                            this.theRandMOptions = this.buildRandMOptions(
-                                this.theRandMJobsList
-                            );
-                        }
-                    }).catch(error => {
-                        this.error = error;
-                        this.errorMessage = reduceErrors(error);
-                    })
+            }).catch(error => {
+                this.error = error;
+                this.errorMessage = reduceErrors(error);
             })
     }
 
-    buildRandMOptions(jobs) {
+    // convert the List<Partner_Project__c> into an array to populate the dropdown
+    buildPartnerProjectOptions(partnerProjects) {
         var options = [];
 
-        Object.values(jobs).forEach((job) => {
+        Object.values(partnerProjects).forEach((partnerProject) => {
             options.push({
-                label: job.Name,
-                value: job.Name
+                label: partnerProject.Name,
+                value: partnerProject.Name
             });
         });
 
+        // sort alphabetically
         options.sort(function (a, b) {
             var nameA = a.label.toUpperCase(); // ignore upper and lowercase
             var nameB = b.label.toUpperCase(); // ignore upper and lowercase
@@ -132,19 +119,21 @@ export default class IndTrnSignupFormMain extends LightningElement {
         return options;
     }
 
-    handleRandMJobSelection(event) {
+    // handle the event fired by the selection of a partner project
+    handlePartnerProjectSelection(event) {
         // set the selected session
-        this.theSelectedRandMValue = event.detail.value;
+        this.theSelectedPartnerProjectValue = event.detail.value;
 
         // find the job for the selected session
-        this.theSelectedRandMJob = this.theRandMJobsList.find(
-            (v) => v.Name === this.theSelectedRandMValue
+        this.theSelectedPartnerProject = this.thePartnerProjectList.find(
+            (v) => v.Name === this.theSelectedPartnerProjectValue
         );
     }
 
     // --------------------------------------------------------------------------------
     // List of courses (Volunteer Jobs).
     //
+
     theJobCourseList;
     theCourseDetails;
     theSelectedCourseValue = "";
@@ -218,6 +207,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     // --------------------------------------------------------------------------------
     // List of sessions (Volunteer Hours).
     //
+
     theSessionVolHoursList;
     theSessionDetails;
     theSelectedSessionValue = "";
@@ -229,7 +219,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
         if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
             const timeInMillisecs = this.theSelectedVolHours.Start_Time__c;
             const date = new Date(timeInMillisecs);
-            var hh = String(date.getHours()-1).padStart(2, '0');
+            var hh = String(date.getHours() - 1).padStart(2, '0');
             var mm = String(date.getMinutes()).padStart(2, '0');
 
             return hh + ':' + mm;
@@ -239,10 +229,10 @@ export default class IndTrnSignupFormMain extends LightningElement {
     }
 
     get theStartDateTime() {
-        if (this.theSelectedVolHours && this.theSelectedVolHours.GW_Volunteers__Start_Date__c) {
+        if (this.theSelectedVolHours && this.theSelectedVolHours.GW_Volunteers__Start_Date__c && this.theSelectedVolHours.Time_Zone__c) {
             const date = new Date(this.theSelectedVolHours.GW_Volunteers__Start_Date__c);
 
-            return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + "   " + this.theStartTime;
+            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}   ${this.theStartTime}   ${this.theSelectedVolHours.Time_Zone__c}`;
         }
 
         return "";
@@ -331,6 +321,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
     // --------------------------------------------------------------------------------
     // Handle the contact info
     //
+
     theFirstname = "";
     theLastname = "";
     theEmail = "";
@@ -440,7 +431,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
         }
     }
 
-    handleAnotherSession(){
+    handleAnotherSession() {
         this.initialiseAllStateForStartup();
     }
 }
