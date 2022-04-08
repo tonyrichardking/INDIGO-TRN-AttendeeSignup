@@ -8,6 +8,7 @@ import ReadVolunteerHoursForJobFromDate from "@salesforce/apex/INDIGO_TRN_AppCon
 import ReadJobsForCampaignId from "@salesforce/apex/INDIGO_TRN_AppController.ReadJobsForCampaignId";
 import ReadCampaignForName from "@salesforce/apex/INDIGO_TRN_AppController.ReadCampaignForName";
 import EnsureAttendeeForContactAndVolHours from "@salesforce/apex/INDIGO_TRN_AppController.EnsureAttendeeForContactAndVolHours";
+import ReadActivePartnerProjects from "@salesforce/apex/INDIGO_TRN_AppController.ReadActivePartnerProjects";
 
 const theRandMCampaignName = "R and M Partners";
 
@@ -22,7 +23,8 @@ export default class IndTrnSignupFormMain extends LightningElement {
     errorMessage = 'Error message undefined';
 
     theDateToday;
-    theLastEditedDate = '3/4/2022';
+    theLastEditedDate = '8/4/2022';
+    theTimeNow;
 
     dd;
     mm;
@@ -40,22 +42,91 @@ export default class IndTrnSignupFormMain extends LightningElement {
         this.mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
         this.yyyy = today.getFullYear();
         this.theDateToday = this.dd + '/' + this.mm + '/' + this.yyyy;
+        this.theTimeNow = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
         // initialise the drop-downs
 
         this.initialiseCoursesForCampaign();
         this.initialiseOrganisations();
         this.initialiseAllStateForStartup();
+        this.initialisePartnerProjects();
     }
 
-    initialiseAllStateForStartup(){
+    initialiseAllStateForStartup() {
         this.enableFirstPage = true;
         this.hasMultipleSessions = false;
         this.assertSessionsAvailable = true;
-        this.theEnableMoreDetails = false;        
+        this.theEnableMoreDetails = false;
         this.theSelectedCourseValue = "";
         this.theSelectedSessionValue = "";
         this.theSelectedVolHours = null;
+    }
+
+    // --------------------------------------------------------------------------------
+    // List of Partner Projects
+    //
+
+    thePartnerProjectList;
+    thePartnerProjectOptions;
+    theSelectedPartnerProjectValue = "";
+    theSelectedPartnerProject;                // the partner project selected by the user
+
+    get thePartnerProjects() {
+        return this.thePartnerProjectOptions;
+    }
+
+    initialisePartnerProjects() {
+        ReadActivePartnerProjects()
+            .then((result) => {
+                if (result != null) {
+                    this.thePartnerProjectList = result;
+                    this.thePartnerProjectOptions = this.buildPartnerProjectOptions(this.thePartnerProjectList);
+                }
+            }).catch(error => {
+                this.error = error;
+                this.errorMessage = reduceErrors(error);
+            })
+    }
+
+    buildPartnerProjectOptions(partnerProjects) {
+        var options = [];
+
+        Object.values(partnerProjects).forEach((partnerProject) => {
+            options.push({
+                label: partnerProject.Name,
+                value: partnerProject.Name
+            });
+        });
+
+        options.sort(function (a, b) {
+            var nameA = a.label.toUpperCase(); // ignore upper and lowercase
+            var nameB = b.label.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+                return -1; //nameA comes first
+            }
+            if (nameA > nameB) {
+                return 1; // nameB comes first
+            }
+
+            return 0;  // names must be equal
+        });
+
+        options.unshift({
+            label: 'None',
+            value: 'None'
+        });
+
+        return options;
+    }
+
+    handlePartnerProjectSelection(event) {
+        // set the selected session
+        this.theSelectedPartnerProjectValue = event.detail.value;
+
+        // find the job for the selected session
+        this.theSelectedPartnerProject = this.thePartnerProjectList.find(
+            (v) => v.Name === this.theSelectedPartnerProjectValue
+        );
     }
 
     // --------------------------------------------------------------------------------
@@ -229,7 +300,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
         if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
             const timeInMillisecs = this.theSelectedVolHours.Start_Time__c;
             const date = new Date(timeInMillisecs);
-            var hh = String(date.getHours()-1).padStart(2, '0');
+            var hh = String(date.getHours() - 1).padStart(2, '0');
             var mm = String(date.getMinutes()).padStart(2, '0');
 
             return hh + ':' + mm;
@@ -440,7 +511,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
         }
     }
 
-    handleAnotherSession(){
+    handleAnotherSession() {
         this.initialiseAllStateForStartup();
     }
 }

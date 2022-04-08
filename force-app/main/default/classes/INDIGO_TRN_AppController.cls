@@ -229,4 +229,33 @@ public without sharing class INDIGO_TRN_AppController
    
         return newAttendee;
     }  
+
+    //
+    // Partner Projects
+    //
+
+    // --------------------------------------------------------------------------------
+    @AuraEnabled(cacheable=true)
+    public static List<Partner_Project__c> ReadActivePartnerProjects() 
+    {
+        //system.debug('ReadActivePartnerProjects:');
+    
+        List<Partner_Project__c> partnerProjects = [
+            SELECT Id, Name, Activity_Status__c
+            FROM Partner_Project__c
+            //WHERE Activity_Status__c =: '🟢 Operational' OR  Activity_Status__c = '🔵 Onboarding'
+        ];
+
+        List<Partner_Project__c> activePartnerProjects = new List<Partner_Project__c>();
+
+        for (Partner_Project__c partnerProject : partnerProjects)
+        {
+            if (partnerProject.Activity_Status__c.contains('Operational') || partnerProject.Activity_Status__c.contains('Onboarding'))
+            {
+                activePartnerProjects.add(partnerProject);
+            }
+        }
+
+        return activePartnerProjects;
+    }
 }

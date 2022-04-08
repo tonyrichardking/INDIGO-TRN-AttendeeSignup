@@ -1,12 +1,13 @@
 <template>
-<!--     
+    <!-- debug info -->
+
     <lightning-tile>
         <p>Indigo Training Form Development.</p>
         <p>Campaign: {pageCampaignName}.</p>
         <p>Date: {theDateToday}.</p>
+        <p>Time: {theTimeNow}.</p>
         <p>Last Edit: {theLastEditedDate}.</p>
-    </lightning-tile> 
--->
+    </lightning-tile>
 
     <!-- Contact details form-->
     <template if:true={enableFirstPage}>
@@ -87,10 +88,18 @@
 
                 <div class="rfl-signup-inputs">
 
+                    <!--                     
                     <lightning-combobox name="organisation"
                         label="Do you work for one of our partners? If no, please select ‘None"
                         value={theSelectedRandMValue} placeholder="Please Select One" options={theRandMPartners}
                         onchange={handleRandMJobSelection} required>
+                    </lightning-combobox> 
+                     -->
+
+                    <lightning-combobox name="partnerProject"
+                        label="Do you work for one of our partners? If no, please select ‘None"
+                        value={theSelectedPartnerProjectValue} placeholder="Please Select One"
+                        options={thePartnerProjects} onchange={handlePartnerProjectSelection} required>
                     </lightning-combobox>
 
                     <lightning-combobox name="newsletterAgreement"
