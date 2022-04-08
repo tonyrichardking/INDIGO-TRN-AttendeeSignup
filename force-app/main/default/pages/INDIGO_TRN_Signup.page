@@ -417,44 +417,37 @@
 
         <!-- Footer -->
 
-        <div style=" background-color:#f1f2f2; ">
+        <div style="background-color:#104f9e; text-align:center;padding:10px">
 
-            <center>
-
-                <img style="width: 100%; max-width: 600px;" src="https://c.eu43.content.force.com/servlet/servlet.ImageServer?id=01569000007vu9L&oid=00D1r000002cPn9&lastMod=1615309101000"
-                />
-
-                <p>
-                    <a style="font-size:12px;" href="https://www.indigovolunteers.org/donate">Donate to Indigo
+            <p style="margin:0 0 8px 0;">
+                <div style="display:inline-block; width:25px; height:25px; margin: 0px 5px;">
+                    <a href="https://www.facebook.com/indigovolunteers/" style="text-decoration:none;">
+                        <img src="https://indigovolunteers--c.eu43.content.force.com/servlet/servlet.ImageServer?id=01569000008NXT7&oid=00D1r000002cPn9&lastMod=1647257453000"
+                            alt="facebook" style="width:25px; height:25px;" />
                     </a>
-                </p>
-
-                <a style="text-decoration:none" href="https://www.facebook.com/indigovolunteers/">
-                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5sK&oid=00D1r000002cPn9&lastMod=1590070083000"
-                        alt="Facebook" style="border: none;" height="24" width="24" />
-                </a>
-
-                <span>&nbsp;&nbsp;</span>
-                <a style="text-decoration:none" href="https://www.instagram.com/indigovolunteers/">
-                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5vt&oid=00D1r000002cPn9&lastMod=1590070302000"
-                        alt="Twitter" style="border: none;" height="24" width="24" />
-                </a>
-
-                <span>&nbsp;&nbsp;</span>
-                <a style="text-decoration:none" href="http://www.twitter.com/indigovolunteer" target="_blank" rel="noopener noreferrer" data-auth="NotApplicable">
-                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5sa&oid=00D1r000002cPn9&lastMod=1590070202000"
-                        alt="Instagram" style="border: none;" height="24" width="24" />
-                </a>
-
-                <span>&nbsp;&nbsp;</span>
-                <a style="text-decoration:none" href="https://www.linkedin.com/company/indigo-volunteers" target="_blank" rel="noopener noreferrer"
-                    data-auth="NotApplicable">
-                    <img src="https://c.eu12.content.force.com/servlet/servlet.ImageServer?id=0151r000008I5xF&oid=00D1r000002cPn9&lastMod=1590070328000"
-                        alt="LinkedIn" style="border: none;" height="24" width="24" />
-                </a>
-
-            </center>
-
+                </div>
+                <div style="display:inline-block; width:25px; height:25px; margin: 0px 5px;">
+                    <a href="https://www.instagram.com/indigovolunteers/" style="text-decoration:none;">
+                        <img src="https://indigovolunteers--c.eu43.content.force.com/servlet/servlet.ImageServer?id=01569000008NXTH&oid=00D1r000002cPn9&lastMod=1647257505000"
+                            alt="instagram" style="width:25px; height:25px;" />
+                    </a>
+                </div>
+                <div style="display:inline-block; width:25px; height:25px; margin: 0px 5px;">
+                    <a href="https://www.linkedin.com/company/indigo-volunteers" style="text-decoration:none;">
+                        <img src="https://indigovolunteers--c.eu43.content.force.com/servlet/servlet.ImageServer?id=01569000008NXTR&oid=00D1r000002cPn9&lastMod=1647257541000"
+                            alt="linkedin" style="width:25px; height:25px;" />
+                    </a>
+                </div>
+                <div style="display:inline-block; width:25px; height:25px; margin: 0px 5px;">
+                    <a href="https://twitter.com/indigovolunteer" style="text-decoration:none;">
+                        <img src="https://indigovolunteers--c.eu43.content.force.com/servlet/servlet.ImageServer?id=01569000008NXT2&oid=00D1r000002cPn9&lastMod=1647257324000"
+                            alt="twitter" style="width:25px; height:25px;" />
+                    </a>
+                </div>
+            </p>
+            <p style="margin:0;font-size:1em;line-height:20px;">
+                <a href="https://www.indigovolunteers.org/" style="text-decoration:none;color:#f1f2f2">&reg; Indigo Volunteers 2022</a>
+            </p>
         </div>
 
         <!-- Lightning Web Component -->
@@ -486,7 +479,7 @@
                     errorMessage—The error message if the status is ERROR.
             */
 
-            var campaignParam = "{!$CurrentPage.parameters.campaign}"; 
+            var campaignParam = "{!$CurrentPage.parameters.campaign}";
 
             /* Create the top-level RunForLoveHome Lightning Web Component */
 
