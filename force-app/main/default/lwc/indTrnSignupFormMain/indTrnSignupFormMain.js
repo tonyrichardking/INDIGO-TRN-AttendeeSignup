@@ -215,17 +215,43 @@ export default class IndTrnSignupFormMain extends LightningElement {
     hasMultipleSessions = false;        // there are multiple sessions for this course (job)
     assertSessionsAvailable = true;     // only allow signup if there are future sessions for this course (job)
 
+    /*     
+        get theStartTime() {
+            if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
+                const timeInMillisecs = this.theSelectedVolHours.Start_Time__c;
+                const date = new Date(timeInMillisecs);
+                var hh = String(date.getHours() - 1).padStart(2, '0');
+                var mm = String(date.getMinutes()).padStart(2, '0');
+    
+                return hh + ':' + mm;
+            }
+    
+            return "";
+        } 
+    */
+
+    // Don't use the Date object for time because it converts to the local browser timezone
     get theStartTime() {
         if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
-            const timeInMillisecs = this.theSelectedVolHours.Start_Time__c;
-            const date = new Date(timeInMillisecs);
-            var hh = String(date.getHours() - 1).padStart(2, '0');
-            var mm = String(date.getMinutes()).padStart(2, '0');
+            const formattedTime = this.formatTime(this.theSelectedVolHours.Start_Time__c);
+            //alert('theStartTime: Start_Time__c in millisecs = ' + this.theSelectedVolHours.Start_Time__c + ', formattedTime = '+ formattedTime);
 
-            return hh + ':' + mm;
+            return formattedTime;
         }
 
         return "";
+    }
+
+    formatTime(milliseconds) {
+        const seconds = Math.floor((milliseconds / 1000) % 60);
+        const minutes = Math.floor((milliseconds / 1000 / 60) % 60);
+        const hours = Math.floor((milliseconds / 1000 / 60 / 60) % 24);
+
+        return [
+            hours.toString().padStart(2, "0"),
+            minutes.toString().padStart(2, "0")
+            // seconds.toString().padStart(2, "0")
+        ].join(":");
     }
 
     get theStartDateTime() {
