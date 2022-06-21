@@ -65,7 +65,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
 
     thePartnerProjectList;                      // the List<Partner_Project__c> returned from the controller
     thePartnerProjectOptions;                   // the java array of partner project strings 
-    theSelectedPartnerProjectValue = "";        // the value returned from the partner project dropdown
+    theSelectedPartnerProjectValue = null;        // the value returned from the partner project dropdown
     theSelectedPartnerProject;                  // the partner project selected by the user
 
     get thePartnerProjects() {                  // accessor used to populate the dropdown
@@ -93,7 +93,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
         Object.values(partnerProjects).forEach((partnerProject) => {
             options.push({
                 label: partnerProject.Name,
-                value: partnerProject.Name
+                value: partnerProject.Id
             });
         });
 
@@ -113,7 +113,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
 
         options.unshift({
             label: 'None',
-            value: 'None'
+            value: null
         });
 
         return options;
@@ -126,8 +126,10 @@ export default class IndTrnSignupFormMain extends LightningElement {
 
         // find the job for the selected session
         this.theSelectedPartnerProject = this.thePartnerProjectList.find(
+        //this.theSelectedPartnerProject = this.thePartnerProjectOptions.find(
             (v) => v.Name === this.theSelectedPartnerProjectValue
         );
+
     }
 
     // --------------------------------------------------------------------------------
@@ -215,55 +217,22 @@ export default class IndTrnSignupFormMain extends LightningElement {
     hasMultipleSessions = false;        // there are multiple sessions for this course (job)
     assertSessionsAvailable = true;     // only allow signup if there are future sessions for this course (job)
 
-    /*     
-        get theStartTime() {
-            if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
-                const timeInMillisecs = this.theSelectedVolHours.Start_Time__c;
-                const date = new Date(timeInMillisecs);
-                var hh = String(date.getHours() - 1).padStart(2, '0');
-                var mm = String(date.getMinutes()).padStart(2, '0');
+
+get theStartDateTime() {
+    if (this.theSelectedVolHours && this.theSelectedVolHours.Session_Start__c){
+        const date = new Date(this.theSelectedVolHours.Session_Start__c);
+        let dd = String(date.getDate()).padStart(2, '0');
+        let MM = String(date.getMonth()+1).padStart(2, '0');
+        let yyyy = String(date.getFullYear());
+        let hh = String(date.getHours()).padStart(2, '0');
+        let mm = String(date.getMinutes()).padStart(2, '0');
+        let timezone = String(date.toString()).slice(25,33);        
+        let returnDateTime = `${dd}/${MM}/${yyyy} - ${hh}:${mm} (${timezone})`;
+        return returnDateTime;
+    }
+    return "";
     
-                return hh + ':' + mm;
-            }
-    
-            return "";
-        } 
-    */
-
-    // Don't use the Date object for time because it converts to the local browser timezone
-    get theStartTime() {
-        if (this.theSelectedVolHours && this.theSelectedVolHours.Start_Time__c) {
-            const formattedTime = this.formatTime(this.theSelectedVolHours.Start_Time__c);
-            //alert('theStartTime: Start_Time__c in millisecs = ' + this.theSelectedVolHours.Start_Time__c + ', formattedTime = '+ formattedTime);
-
-            return formattedTime;
-        }
-
-        return "";
-    }
-
-    formatTime(milliseconds) {
-        const seconds = Math.floor((milliseconds / 1000) % 60);
-        const minutes = Math.floor((milliseconds / 1000 / 60) % 60);
-        const hours = Math.floor((milliseconds / 1000 / 60 / 60) % 24);
-
-        return [
-            hours.toString().padStart(2, "0"),
-            minutes.toString().padStart(2, "0")
-            // seconds.toString().padStart(2, "0")
-        ].join(":");
-    }
-
-    get theStartDateTime() {
-        if (this.theSelectedVolHours && this.theSelectedVolHours.GW_Volunteers__Start_Date__c && this.theSelectedVolHours.Time_Zone__c) {
-            const date = new Date(this.theSelectedVolHours.GW_Volunteers__Start_Date__c);
-
-            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}   ${this.theStartTime}   ${this.theSelectedVolHours.Time_Zone__c}`;
-        }
-
-        return "";
-    }
-
+}
     get theSessions() {
         return this.theSessionDetails;
     }
@@ -330,7 +299,6 @@ export default class IndTrnSignupFormMain extends LightningElement {
         this.theSelectedVolHours = this.theSessionVolHoursList.find(
             (v) => v.Session__c === this.theSelectedSessionValue
         );
-
         //alert('handleSessionSelection: session = ' + this.theSelectedVolHours.Session_Description__c);
     }
 
@@ -420,6 +388,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
             //alert('Both gdpr and newsletter combos must have a value selected');
             this.showRequiredError = true;
         } else {
+
             EnsureContact({
                 firstname: this.theFirstname,
                 lastname: this.theLastname,
@@ -431,9 +400,10 @@ export default class IndTrnSignupFormMain extends LightningElement {
                     EnsureAttendeeForContactAndVolHours({
                         contactId: result.Id,
                         volHoursId: this.theSelectedVolHours.Id,
-                        zoomDetails: this.theSelectedVolHours.Zoom_Session_Details__c,
-                        zoomUrl: this.theSelectedVolHours.T4R_TRN_Zoom_Session_URL__c,
-                        sessionDescription: this.theSelectedVolHours.Session_Description__c
+                        partnerProjectId: this.theSelectedPartnerProjectValue
+                        //zoomDetails: this.theSelectedVolHours.Zoom_Session_Details__c,
+                        //zoomUrl: this.theSelectedVolHours.T4R_TRN_Zoom_Session_URL__c,
+                        //sessionDescription: this.theSelectedVolHours.Session_Description__c
                     }).then((result) => {
                         if (result != null) {
                             this.theNewAttendee = result;
@@ -454,6 +424,7 @@ export default class IndTrnSignupFormMain extends LightningElement {
             // change the component view
             this.showRequiredError = false;
             this.enableFirstPage = false;
+            
         }
     }
 

@@ -37,24 +37,30 @@
 
                 <div class="rfl-log-tile">
                     <template if:true={theSelectedVolHours}>
-                        <lightning-card title="Details" icon-name="">
-                            <div class="slds-grid slds-grid_vertical">
+                        <!--<lightning-card icon-name="">-->
+                            <!--<div class="slds-grid slds-grid_vertical">-->
 
                                 <div class="rfl-signup-details">
                                     <div class="slds-col">
-                                        <p><strong>Start Date and Time: </strong>{theStartDateTime}</p>
+                                        <p>
+                                            <strong>{theStartDateTime}*</strong>
+                                        </p>
+                                        <br>
+                                        
                                     </div>
                                     <div class="slds-col">
-                                        <p><strong>Description: </strong>{theSelectedVolHours.Session_Description__c}
+                                        <p>{theSelectedVolHours.Session_Description__c}
+                                        
                                         </p>
                                     </div>
                                 </div>
+                                <p class="explainer"><i>*Please be aware that emails we send you might display the start time in a different time zone.</i></p>
 
-                                <p slot="footer"><i>Unfortunately, you can only sign up to one session at a time. In
+                                <!--<p slot="footer" style="margin: 10px;"><i>Unfortunately, you can only sign up to one session at a time. In
                                         case you’re interested in more than one session, simply fill in the form again!
-                                        We’re sorry about the inconvenience.</i></p>
-                            </div>
-                        </lightning-card>
+                                        We’re sorry about the inconvenience.</i></p>-->
+                            <!--</div>-->
+                        <!--</lightning-card>-->
                     </template>
                 </div>
 
@@ -91,9 +97,9 @@
                 <div class="rfl-signup-inputs">
 
                     <lightning-combobox name="partnerProject"
-                        label="Do you work for one of our partners? If no, please select ‘None"
+                        label="Do you work for one of our partners?"
                         value={theSelectedPartnerProjectValue} placeholder="Please Select One"
-                        options={thePartnerProjects} onchange={handlePartnerProjectSelection} required>
+                        options={thePartnerProjects} onchange={handlePartnerProjectSelection}>
                     </lightning-combobox>
 
                     <lightning-combobox name="newsletterAgreement"
@@ -129,14 +135,16 @@
         <lightning-tile title="Thank You">
 
             <div class="rfl-signup-thankyou">
-                <p>Thank you for registering for "{theSelectedCourseValue}" {theFirstname}!</p>
-                <p>You should receive an email with more information and your Zoom link within a day. If you do not,
-                    please check your 'spam' folder.</p>
+                <p>Thank you for registering for "{theSelectedCourseValue}", {theFirstname}!</p>
+                <p>You should receive a confirmation email from us shortly.</p>
             </div>
 
             <div class="rfl-signup-thankyou">
 
-                <p>If you want to sign up for another session you can click the button below.</p>
+                <p>If you want to sign up for another session you can click the button below.
+                <br>
+                <br>
+                </p>
 
                 <!-- Button to sign up for another session -->
                 <lightning-button variant="Success" label="Sign up to another session." title="AnotherSession"
